@@ -11,6 +11,8 @@ import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 /**
@@ -264,5 +266,18 @@ public class RedisService
     public Collection<String> keys(final String pattern)
     {
         return redisTemplate.keys(pattern);
+    }
+
+    /**
+     * 执行lua脚本
+     *
+     * @param script 脚本字符串
+     * @param keys key值
+     * @param args 参数
+     * @return 对象
+     */
+    public Object execute(String script, List keys, Object... args){
+        RedisScript<String> redisScript = new DefaultRedisScript<>(script, String.class);
+        return redisTemplate.execute(redisScript, keys, args);
     }
 }
