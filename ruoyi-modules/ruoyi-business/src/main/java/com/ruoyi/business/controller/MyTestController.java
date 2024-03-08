@@ -38,7 +38,7 @@ public class MyTestController extends BaseController
     /**
      * 查询测试列表
      */
-    @RequiresPermissions("system:test:list")
+    @RequiresPermissions("business:test:list")
     @GetMapping("/list")
     public TableDataInfo list(MyTest myTest)
     {
@@ -50,7 +50,7 @@ public class MyTestController extends BaseController
     /**
      * 导出测试列表
      */
-    @RequiresPermissions("system:test:export")
+    @RequiresPermissions("business:test:export")
     @Log(title = "测试", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, MyTest myTest)
@@ -63,7 +63,7 @@ public class MyTestController extends BaseController
     /**
      * 获取测试详细信息
      */
-    @RequiresPermissions("system:test:query")
+    @RequiresPermissions("business:test:query")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -73,7 +73,7 @@ public class MyTestController extends BaseController
     /**
      * 新增测试
      */
-    @RequiresPermissions("system:test:add")
+    @RequiresPermissions("business:test:add")
     @Log(title = "测试", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody MyTest myTest)
@@ -84,7 +84,7 @@ public class MyTestController extends BaseController
     /**
      * 修改测试
      */
-    @RequiresPermissions("system:test:edit")
+    @RequiresPermissions("business:test:edit")
     @Log(title = "测试", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody MyTest myTest)
@@ -95,7 +95,7 @@ public class MyTestController extends BaseController
     /**
      * 删除测试
      */
-    @RequiresPermissions("system:test:remove")
+    @RequiresPermissions("business:test:remove")
     @Log(title = "测试", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
