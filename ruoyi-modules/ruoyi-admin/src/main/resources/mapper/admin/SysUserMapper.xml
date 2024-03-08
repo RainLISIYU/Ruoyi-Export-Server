@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.admin.mapper.SysUserMapper">
 
-    <resultMap type="SysUser" id="SysUserResult">
+    <resultMap type="com.ruoyi.admin.domain.SysUser" id="SysUserResult">
         <result property="userId" column="user_id"/>
         <result property="deptId" column="dept_id"/>
         <result property="userName" column="user_name"/>
@@ -30,7 +30,7 @@
         select user_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark from sys_user
     </sql>
 
-    <select id="selectSysUserList" parameterType="SysUser" resultMap="SysUserResult">
+    <select id="selectSysUserList" parameterType="com.ruoyi.admin.domain.SysUser" resultMap="SysUserResult">
         <include refid="selectSysUserVo"/>
         <where>
             <if test="deptId != null ">and dept_id = #{deptId}</if>
@@ -53,7 +53,7 @@
         where user_id = #{userId}
     </select>
 
-    <insert id="insertSysUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+    <insert id="insertSysUser" parameterType="com.ruoyi.admin.domain.SysUser" useGeneratedKeys="true" keyProperty="userId">
         insert into sys_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="deptId != null">dept_id,</if>
@@ -97,7 +97,7 @@
         </trim>
     </insert>
 
-    <update id="updateSysUser" parameterType="SysUser">
+    <update id="updateSysUser" parameterType="com.ruoyi.admin.domain.SysUser">
         update sys_user
         <trim prefix="SET" suffixOverrides=",">
             <if test="deptId != null">dept_id = #{deptId},</if>

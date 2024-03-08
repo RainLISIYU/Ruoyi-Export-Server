@@ -2,6 +2,7 @@ package com.ruoyi.admin.service;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.admin.domain.SysUser;
 import com.ruoyi.common.core.constant.ServiceNameConstants;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -12,7 +13,7 @@ import org.springframework.cloud.openfeign.FeignClient;
  * @author ruoyi
  * @date 2023-08-04
  */
-public interface ISysUserService {
+public interface ISysUserService extends IService<SysUser> {
     /**
      * 查询用户信息
      *

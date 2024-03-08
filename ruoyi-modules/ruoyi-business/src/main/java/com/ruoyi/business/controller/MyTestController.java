@@ -1,87 +1,105 @@
-package com.ruoyi.business.controller;
+package com.ruoyi.businesss.controller;
 
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.business.entity.MyTest;
-import com.ruoyi.business.service.MyTestService;
+import java.util.List;
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.ruoyi.common.log.annotation.Log;
+import com.ruoyi.common.log.enums.BusinessType;
+import com.ruoyi.common.security.annotation.RequiresPermissions;
+import com.ruoyi.business.domain.MyTest;
+import com.ruoyi.business.service.IMyTestService;
 import com.ruoyi.common.core.web.controller.BaseController;
 import com.ruoyi.common.core.web.domain.AjaxResult;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.List;
+import com.ruoyi.common.core.utils.poi.ExcelUtil;
+import com.ruoyi.common.core.web.page.TableDataInfo;
 
 /**
- * 测试表(MyTest)表控制层
- *
- * @author chenqiang
- * @since 2024-03-08 14:08:04
+ * 测试Controller
+ * 
+ * @author ruoyi
+ * @date 2024-03-08
  */
 @RestController
-@RequestMapping("myTest")
-public class MyTestController extends BaseController {
-    /**
-     * 服务对象
-     */
-    @Resource
-    private MyTestService myTestService;
+@RequestMapping("/test")
+public class MyTestController extends BaseController
+{
+    @Autowired
+    private IMyTestService myTestService;
 
     /**
-     * 分页查询所有数据
-     *
-     * @param page   分页对象
-     * @param myTest 查询实体
-     * @return 所有数据
+     * 查询测试列表
      */
-    @GetMapping
-    public AjaxResult selectAll(Page<MyTest> page, MyTest myTest) {
-        return success(this.myTestService.page(page, new QueryWrapper<>(myTest)));
+    @RequiresPermissions("system:test:list")
+    @GetMapping("/list")
+    public TableDataInfo list(MyTest myTest)
+    {
+        startPage();
+        List<MyTest> list = myTestService.selectMyTestList(myTest);
+        return getDataTable(list);
     }
 
     /**
-     * 通过主键查询单条数据
-     *
-     * @param id 主键
-     * @return 单条数据
+     * 导出测试列表
      */
-    @GetMapping("{id}")
-    public AjaxResult selectOne(@PathVariable Serializable id) {
-        return success(this.myTestService.getById(id));
+    @RequiresPermissions("system:test:export")
+    @Log(title = "测试", businessType = BusinessType.EXPORT)
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, MyTest myTest)
+    {
+        List<MyTest> list = myTestService.selectMyTestList(myTest);
+        ExcelUtil<MyTest> util = new ExcelUtil<MyTest>(MyTest.class);
+        util.exportExcel(response, list, "测试数据");
     }
 
     /**
-     * 新增数据
-     *
-     * @param myTest 实体对象
-     * @return 新增结果
+     * 获取测试详细信息
      */
+    @RequiresPermissions("system:test:query")
+    @GetMapping(value = "/{id}")
+    public AjaxResult getInfo(@PathVariable("id") Long id)
+    {
+        return success(myTestService.selectMyTestById(id));
+    }
+
+    /**
+     * 新增测试
+     */
+    @RequiresPermissions("system:test:add")
+    @Log(title = "测试", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult insert(@RequestBody MyTest myTest) {
-        return success(this.myTestService.save(myTest));
+    public AjaxResult add(@RequestBody MyTest myTest)
+    {
+        return toAjax(myTestService.insertMyTest(myTest));
     }
 
     /**
-     * 修改数据
-     *
-     * @param myTest 实体对象
-     * @return 修改结果
+     * 修改测试
      */
+    @RequiresPermissions("system:test:edit")
+    @Log(title = "测试", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult update(@RequestBody MyTest myTest) {
-        return success(this.myTestService.updateById(myTest));
+    public AjaxResult edit(@RequestBody MyTest myTest)
+    {
+        return toAjax(myTestService.updateMyTest(myTest));
     }
 
     /**
-     * 删除数据
-     *
-     * @param idList 主键结合
-     * @return 删除结果
+     * 删除测试
      */
-    @DeleteMapping
-    public AjaxResult delete(@RequestParam("idList") List<Long> idList) {
-        return success(this.myTestService.removeByIds(idList));
+    @RequiresPermissions("system:test:remove")
+    @Log(title = "测试", businessType = BusinessType.DELETE)
+	@DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable Long[] ids)
+    {
+        return toAjax(myTestService.deleteMyTestByIds(ids));
     }
 }
-

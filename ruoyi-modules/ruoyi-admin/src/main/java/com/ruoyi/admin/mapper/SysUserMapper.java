@@ -2,7 +2,9 @@ package com.ruoyi.admin.mapper;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.admin.domain.SysUser;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 用户信息Mapper接口
@@ -10,7 +12,8 @@ import com.ruoyi.admin.domain.SysUser;
  * @author ruoyi
  * @date 2023-08-04
  */
-public interface SysUserMapper {
+@Mapper
+public interface SysUserMapper extends BaseMapper<SysUser> {
     /**
      * 查询用户信息
      *

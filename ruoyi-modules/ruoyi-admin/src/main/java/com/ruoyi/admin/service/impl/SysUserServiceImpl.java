@@ -2,6 +2,7 @@ package com.ruoyi.admin.service.impl;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.core.utils.DateUtils;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import com.ruoyi.admin.service.ISysUserService;
  * @date 2023-08-04
  */
 @Service
-public class SysUserServiceImpl implements ISysUserService {
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
     @Autowired
     private SysUserMapper sysUserMapper;
 
