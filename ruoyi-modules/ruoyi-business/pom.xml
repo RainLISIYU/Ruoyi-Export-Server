@@ -84,6 +84,12 @@
             <artifactId>ruoyi-common-seata</artifactId>
         </dependency>
 
+        <!-- mybatis plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core -->
         <dependency>
             <groupId>org.openjdk.jmh</groupId>

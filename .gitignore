@@ -44,3 +44,6 @@ nbdist/
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+
+ruoyi-ui.zip
+ruoyi-ui/dist.zip

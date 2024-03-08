@@ -15,7 +15,6 @@
         <module>ruoyi-file</module>
         <module>ruoyi-admin</module>
         <module>ruoyi-business</module>
-        <module>ruoyi-mytest</module>
     </modules>
 
     <artifactId>ruoyi-modules</artifactId>
