@@ -21,4 +21,14 @@ public class ServiceNameConstants
      * 文件服务的serviceid
      */
     public static final String FILE_SERVICE = "ruoyi-file";
+
+    /**
+     * 测试服务的serviceid
+     */
+    public static final String TEST_SERVICE = "ruoyi-admin";
+
+    /**
+     * 开发服务的serviceid
+     */
+    public static final  String BUSINESS_SERVICE = "ruoyi-business";
 }
