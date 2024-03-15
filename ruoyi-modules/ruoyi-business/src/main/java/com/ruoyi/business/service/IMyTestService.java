@@ -1,15 +1,17 @@
 package com.ruoyi.business.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.business.domain.MyTest;
 
 /**
  * 测试Service接口
  * 
  * @author ruoyi
- * @date 2024-03-08
+ * @date 2024-03-14
  */
-public interface IMyTestService 
+public interface IMyTestService extends IService<MyTest>
 {
     /**
      * 查询测试

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.system.mapper.MyTestMapper">
-
-    <resultMap type="com.ruoyi.business.domain.MyTest" id="MyTestResult">
+<mapper namespace="com.ruoyi.business.mapper.MyTestMapper">
+    
+    <resultMap type="MyTest" id="MyTestResult">
         <result property="id"    column="id"    />
         <result property="name"    column="name"    />
         <result property="address"    column="address"    />
@@ -14,7 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, name, address from my_test
     </sql>
 
-    <select id="selectMyTestList" parameterType="com.ruoyi.business.domain.MyTest" resultMap="MyTestResult">
+    <select id="selectMyTestList" parameterType="MyTest" resultMap="MyTestResult">
         <include refid="selectMyTestVo"/>
         <where>  
             <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
@@ -27,7 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </select>
         
-    <insert id="insertMyTest" parameterType="com.ruoyi.business.domain.MyTest" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertMyTest" parameterType="MyTest" useGeneratedKeys="true" keyProperty="id">
         insert into my_test
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name != null">name,</if>
@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateMyTest" parameterType="com.ruoyi.business.domain.MyTest">
+    <update id="updateMyTest" parameterType="MyTest">
         update my_test
         <trim prefix="SET" suffixOverrides=",">
             <if test="name != null">name = #{name},</if>

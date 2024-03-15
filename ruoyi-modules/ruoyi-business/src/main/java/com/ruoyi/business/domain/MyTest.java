@@ -9,7 +9,7 @@ import com.ruoyi.common.core.web.domain.BaseEntity;
  * 测试对象 my_test
  * 
  * @author ruoyi
- * @date 2024-03-08
+ * @date 2024-03-14
  */
 public class MyTest extends BaseEntity
 {

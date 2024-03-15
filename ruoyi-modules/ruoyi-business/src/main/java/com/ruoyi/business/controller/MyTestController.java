@@ -1,17 +1,16 @@
-package com.ruoyi.businesss.controller;
+package com.ruoyi.business.controller;
 
 import java.util.List;
 import java.io.IOException;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.security.annotation.InnerAuth;
+import com.ruoyi.system.api.domain.SysTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.security.annotation.RequiresPermissions;
@@ -26,7 +25,7 @@ import com.ruoyi.common.core.web.page.TableDataInfo;
  * 测试Controller
  * 
  * @author ruoyi
- * @date 2024-03-08
+ * @date 2024-03-14
  */
 @RestController
 @RequestMapping("/test")
@@ -102,4 +101,25 @@ public class MyTestController extends BaseController
     {
         return toAjax(myTestService.deleteMyTestByIds(ids));
     }
+
+    /**
+     * feign查询接口
+     *
+     * @return 结果集
+     */
+    @InnerAuth
+    @GetMapping("query")
+    public R<List<SysTest>> list(@RequestParam(value = "name") String name){
+        List<MyTest> list = myTestService.list(new LambdaQueryWrapper<MyTest>().like(MyTest::getName, name));
+        List<SysTest> collect = list.stream().map(item -> {
+            SysTest test = new SysTest();
+            test.setId(item.getId());
+            test.setAddress(item.getAddress());
+            test.setName(item.getName());
+            return test;
+        }).collect(Collectors.toList());
+        int i = 1/0;
+        return R.ok(collect);
+    }
+
 }

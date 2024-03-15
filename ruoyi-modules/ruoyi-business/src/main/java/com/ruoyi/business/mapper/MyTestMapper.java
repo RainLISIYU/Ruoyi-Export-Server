@@ -1,15 +1,17 @@
 package com.ruoyi.business.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.business.domain.MyTest;
 
 /**
  * 测试Mapper接口
  * 
  * @author ruoyi
- * @date 2024-03-08
+ * @date 2024-03-14
  */
-public interface MyTestMapper 
+public interface MyTestMapper extends BaseMapper<MyTest>
 {
     /**
      * 查询测试

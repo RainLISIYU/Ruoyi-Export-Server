@@ -23,7 +23,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:test:add']"
+          v-hasPermi="['business:test:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -34,7 +34,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:test:edit']"
+          v-hasPermi="['business:test:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -45,7 +45,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:test:remove']"
+          v-hasPermi="['business:test:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -55,7 +55,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:test:export']"
+          v-hasPermi="['business:test:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -73,19 +73,19 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:test:edit']"
+            v-hasPermi="['business:test:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:test:remove']"
+            v-hasPermi="['business:test:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-
+    
     <pagination
       v-show="total>0"
       :total="total"
@@ -242,7 +242,7 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('system/test/export', {
+      this.download('business/test/export', {
         ...this.queryParams
       }, `test_${new Date().getTime()}.xlsx`)
     }

@@ -1,6 +1,9 @@
 package com.ruoyi.business.service.impl;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.business.mapper.MyTestMapper;
@@ -11,10 +14,10 @@ import com.ruoyi.business.service.IMyTestService;
  * 测试Service业务层处理
  * 
  * @author ruoyi
- * @date 2024-03-08
+ * @date 2024-03-14
  */
 @Service
-public class MyTestServiceImpl implements IMyTestService 
+public class MyTestServiceImpl extends ServiceImpl<MyTestMapper, MyTest> implements IMyTestService
 {
     @Autowired
     private MyTestMapper myTestMapper;
@@ -28,7 +31,7 @@ public class MyTestServiceImpl implements IMyTestService
     @Override
     public MyTest selectMyTestById(Long id)
     {
-        return myTestMapper.selectMyTestById(id);
+        return myTestMapper.selectById(id);
     }
 
     /**
@@ -40,7 +43,8 @@ public class MyTestServiceImpl implements IMyTestService
     @Override
     public List<MyTest> selectMyTestList(MyTest myTest)
     {
-        return myTestMapper.selectMyTestList(myTest);
+//        return myTestMapper.selectMyTestList(myTest);
+        return this.list();
     }
 
     /**
@@ -64,7 +68,8 @@ public class MyTestServiceImpl implements IMyTestService
     @Override
     public int updateMyTest(MyTest myTest)
     {
-        return myTestMapper.updateMyTest(myTest);
+//        return myTestMapper.updateMyTest(myTest);
+        return myTestMapper.updateById(myTest);
     }
 
     /**

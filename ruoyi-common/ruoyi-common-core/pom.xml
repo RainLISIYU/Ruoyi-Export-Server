@@ -113,10 +113,10 @@
             <artifactId>swagger-annotations</artifactId>
         </dependency>
 
-        <!-- mybatis plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.4.3</version>
         </dependency>
 
     </dependencies>
