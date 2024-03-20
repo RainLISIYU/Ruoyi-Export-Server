@@ -28,3 +28,7 @@ spring:
     sentinel:
       transport:
         dashboard: 127.0.0.1:8718
+
+logging:
+  file:
+    name: logs/${spring.application.name}/info.log

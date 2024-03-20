@@ -1,5 +1,7 @@
 package com.ruoyi.business.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -81,7 +83,8 @@ public class MyTestServiceImpl extends ServiceImpl<MyTestMapper, MyTest> impleme
     @Override
     public int deleteMyTestByIds(Long[] ids)
     {
-        return myTestMapper.deleteMyTestByIds(ids);
+//        return myTestMapper.deleteMyTestByIds(ids);
+        return this.removeByIds(Arrays.asList(ids)) ? 1 : 0;
     }
 
     /**

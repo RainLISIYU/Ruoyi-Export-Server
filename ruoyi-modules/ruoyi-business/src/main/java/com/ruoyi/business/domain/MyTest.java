@@ -26,6 +26,9 @@ public class MyTest extends BaseEntity
     @Excel(name = "地址")
     private String address;
 
+    @Excel(name = "删除标识")
+    private Integer deletedAt;
+
     public void setId(Long id) 
     {
         this.id = id;
@@ -52,6 +55,14 @@ public class MyTest extends BaseEntity
     public String getAddress() 
     {
         return address;
+    }
+
+    public Integer getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Integer deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     @Override
