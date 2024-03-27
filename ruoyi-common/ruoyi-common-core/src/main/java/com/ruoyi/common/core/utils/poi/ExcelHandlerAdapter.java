@@ -1,5 +1,8 @@
 package com.ruoyi.common.core.utils.poi;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Workbook;
+
 /**
  * Excel数据格式处理适配器
  * 
@@ -15,5 +18,5 @@ public interface ExcelHandlerAdapter
      *
      * @return 处理后的值
      */
-    Object format(Object value, String[] args);
+    Object format(Object value, String[] args, Cell cell, Workbook wb);
 }
