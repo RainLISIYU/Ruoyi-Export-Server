@@ -42,6 +42,12 @@ service.interceptors.request.use(config => {
       data: typeof config.data === 'object' ? JSON.stringify(config.data) : config.data,
       time: new Date().getTime()
     }
+    const requestSize = Object.keys(JOSN.stringify(requestObj)).length;//请求数据大小
+    const limitSize = 5 * 1024 * 1024;
+    if (requestSize >= limitSize){
+      console.warn(`[${config.url}]:` + '请求数据大小超过5M限制，无法进行防重复提交验证')
+      return config;
+    }
     const sessionObj = cache.session.getJSON('sessionObj')
     if (sessionObj === undefined || sessionObj === null || sessionObj === '') {
       cache.session.setJSON('sessionObj', requestObj)

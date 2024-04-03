@@ -118,6 +118,11 @@ public class Constants
     public static final String RESOURCE_PREFIX = "/profile";
 
     /**
+     * 自动识别json对象白名单
+     */
+    public static final String[] JSON_WHITELIST_STR = { "org.springframework", "com.ruoyi" };
+
+    /**
      * 定时任务白名单配置（仅允许访问的包名，如其他需要可以自行添加）
      */
     public static final String[] JOB_WHITELIST_STR = { "com.ruoyi" };

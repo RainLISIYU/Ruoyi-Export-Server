@@ -1,11 +1,14 @@
 import request from '@/utils/request'
+import { encrypt } from "@/utils/jsencrypt";
 
 // 登录方法
 export function login(username, password, code, uuid) {
+  password = encrypt(password)
   return request({
     url: '/auth/login',
     headers: {
-      isToken: false
+      isToken: false,
+      repeatSubmit: false
     },
     method: 'post',
     data: { username, password, code, uuid }

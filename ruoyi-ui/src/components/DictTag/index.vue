@@ -3,11 +3,11 @@
     <template v-for="(item, index) in options">
       <template v-if="values.includes(item.value)">
         <span
-          v-if="item.raw.listClass == 'default' || item.raw.listClass == ''"
+          v-if="(item.raw.listClass == 'default' || item.raw.listClass == '') && (item.raw.cssClass == '' || item.raw.cssClass == null)"
           :key="item.value"
           :index="index"
           :class="item.raw.cssClass"
-          >{{ item.label + " " }}</span
+          >{{ item.label + ' ' }}</span
         >
         <el-tag
           v-else
@@ -17,7 +17,7 @@
           :type="item.raw.listClass == 'primary' ? '' : item.raw.listClass"
           :class="item.raw.cssClass"
         >
-          {{ item.label + " " }}
+          {{ item.label + ' ' }}
         </el-tag>
       </template>
     </template>
@@ -40,6 +40,10 @@ export default {
     showValue: {
       type: Boolean,
       default: true,
+    },
+    separator: {
+      type: String,
+      default: ","
     }
   },
   data() {
@@ -49,39 +53,30 @@ export default {
   },
   computed: {
     values() {
-      if (this.value !== null && typeof this.value !== "undefined") {
-        return Array.isArray(this.value) ? this.value : [String(this.value)];
-      } else {
-        return [];
-      }
+      if (this.value === null || typeof this.value === 'undefined' || this.value === '') return []
+      return Array.isArray(this.value) ? this.value.map(item => '' + item) : String(this.value).split(this.separator)
     },
     unmatch() {
       this.unmatchArray = [];
-      if (this.value !== null && typeof this.value !== "undefined") {
-        // 传入值为非数组
-        if (!Array.isArray(this.value)) {
-          if (this.options.some((v) => v.value == this.value)) return false;
-          this.unmatchArray.push(this.value);
-          return true;
+      if (this.value === null || typeof this.value === 'undefined' || this.value === '' || this.options.length === 0) return false
+      //传入值为数组
+      let unmatch = false // 添加一个标志来判断是否有未匹配项
+      this.values.forEach(item => {
+        if (!this.options.some(v => v.value === item)){
+          unmatch = true //如果有为匹配项，将标志设置未true
+          this.unmatchArray.push(item)
         }
-        // 传入值为Array
-        this.value.forEach((item) => {
-          if (!this.options.some((v) => v.value == item))
-            this.unmatchArray.push(item);
-        });
-        return true;
-      }
-      // 没有value不显示
-      return false;
+      })
+      return unmatch
     },
   },
   filters: {
     handleArray(array) {
-      if (array.length === 0) return "";
+      if (array.length === 0) return '';
       return array.reduce((pre, cur) => {
-        return pre + " " + cur;
+        return pre + ' ' + cur;
       })
-    }
+    },
   }
 };
 </script>

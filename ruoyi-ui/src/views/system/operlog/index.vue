@@ -1,6 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="操作地址" prop="operIp">
+        <el-input
+          v-model="queryParams.operIp"
+          placeholder="请输入操作地址"
+          clearable
+          style="width: 240px"
+          @keyup.enter.native="handleQuery"
+          />
+      </el-form-item>
       <el-form-item label="系统模块" prop="title">
         <el-input
           v-model="queryParams.title"
@@ -105,7 +114,7 @@
     <el-table ref="tables" v-loading="loading" :data="list" @selection-change="handleSelectionChange" :default-sort="defaultSort" @sort-change="handleSortChange">
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column label="日志编号" align="center" prop="operId" />
-      <el-table-column label="系统模块" align="center" prop="title" />
+      <el-table-column label="系统模块" align="center" prop="title"  :show-overflow-tooltip="true"/>
       <el-table-column label="操作类型" align="center" prop="businessType">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_oper_type" :value="scope.row.businessType"/>
@@ -113,7 +122,7 @@
       </el-table-column>
       <el-table-column label="请求方式" align="center" prop="requestMethod" />
       <el-table-column label="操作人员" align="center" prop="operName" width="110" :show-overflow-tooltip="true" sortable="custom" :sort-orders="['descending', 'ascending']"/>
-      <el-table-column label="主机" align="center" prop="operIp" width="130" :show-overflow-tooltip="true" />
+      <el-table-column label="操作地址" align="center" prop="operIp" width="130" :show-overflow-tooltip="true" />
       <el-table-column label="操作状态" align="center" prop="status">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_common_status" :value="scope.row.status"/>
@@ -151,7 +160,7 @@
     />
 
     <!-- 操作日志详细 -->
-    <el-dialog title="操作日志详细" :visible.sync="open" width="700px" append-to-body>
+    <el-dialog title="操作日志详细" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" label-width="100px" size="mini">
         <el-row>
           <el-col :span="12">
@@ -173,7 +182,7 @@
           <el-col :span="24">
             <el-form-item label="返回参数：">{{ form.jsonResult }}</el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="8">
             <el-form-item label="操作状态：">
               <div v-if="form.status === 0">正常</div>
               <div v-else-if="form.status === 1">失败</div>
@@ -182,7 +191,7 @@
           <el-col :span="8">
             <el-form-item label="消耗时间：">{{ form.costTime }}毫秒</el-form-item>
           </el-col>
-          <el-col :span="10">
+          <el-col :span="8">
             <el-form-item label="操作时间：">{{ parseTime(form.operTime) }}</el-form-item>
           </el-col>
           <el-col :span="24">
@@ -229,6 +238,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        operIp: undefined,
         title: undefined,
         operName: undefined,
         businessType: undefined,
