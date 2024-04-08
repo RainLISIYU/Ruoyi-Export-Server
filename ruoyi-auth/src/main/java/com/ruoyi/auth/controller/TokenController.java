@@ -1,8 +1,7 @@
 package com.ruoyi.auth.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.ruoyi.common.core.utils.sign.RsaUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;

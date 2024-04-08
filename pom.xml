@@ -21,19 +21,23 @@
         <spring-cloud.version>2022.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
         <spring-boot-admin.version>3.0.2</spring-boot-admin.version>
-        <swagger.fox.version>3.0.0</swagger.fox.version>
-        <swagger.core.version>1.6.2</swagger.core.version>
+        <springdoc.version>2.1.0</springdoc.version>
         <tobato.version>1.27.2</tobato.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <pagehelper.boot.version>2.0.0</pagehelper.boot.version>
-        <druid.version>1.2.20</druid.version>
+        <druid.version>1.2.22</druid.version>
         <dynamic-ds.version>4.2.0</dynamic-ds.version>
         <commons.io.version>2.13.0</commons.io.version>
+        <commons.collections4.version>4.4</commons.collections4.version>
         <velocity.version>2.3</velocity.version>
         <fastjson.version>2.0.43</fastjson.version>
         <jjwt.version>0.9.1</jjwt.version>
         <minio.version>8.2.2</minio.version>
         <poi.version>4.1.2</poi.version>
+        <jakarta.version>2.1.1</jakarta.version>
+        <jakarta-api.version>6.0.0</jakarta-api.version>
+        <jackson.version>2.16.0</jackson.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
     </properties>
 
@@ -75,16 +79,16 @@
                 <version>${tobato.version}</version>
             </dependency>
 
-            <!-- Swagger 依赖配置 -->
+            <!-- springdoc 依赖配置 -->
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-models</artifactId>
-                <version>${swagger.core.version}</version>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger.core.version}</version>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
 
             <!-- 验证码 -->
@@ -106,6 +110,12 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons.io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons.collections4.version}</version>
             </dependency>
 
             <!-- excel工具 -->
@@ -204,6 +214,21 @@
                 <groupId>com.ruoyi</groupId>
                 <artifactId>ruoyi-api-system</artifactId>
                 <version>${ruoyi.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/jakarta.annotation/jakarta.annotation-api -->
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta.version}</version>
+            </dependency>
+
+            <!-- Java Servlet -->
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>${jakarta-api.version}</version>
+                <scope>provided</scope>
             </dependency>
 
         </dependencies>

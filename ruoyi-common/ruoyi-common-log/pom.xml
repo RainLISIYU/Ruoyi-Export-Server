@@ -16,7 +16,13 @@
     </description>
 
     <dependencies>
-		
+
+        <!-- Java Servlet -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+
         <!-- RuoYi Common Security -->
         <dependency>
             <groupId>com.ruoyi</groupId>
