@@ -17,10 +17,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
-        <spring-boot.version>3.0.2</spring-boot.version>
+        <spring-boot.version>3.0.13</spring-boot.version>
         <spring-cloud.version>2022.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
-        <spring-boot-admin.version>3.0.2</spring-boot-admin.version>
+        <spring-boot-admin.version>3.0.4</spring-boot-admin.version>
         <springdoc.version>2.1.0</springdoc.version>
         <tobato.version>1.27.2</tobato.version>
         <kaptcha.version>2.3.3</kaptcha.version>
@@ -38,6 +38,11 @@
         <jakarta-api.version>6.0.0</jakarta-api.version>
         <jackson.version>2.16.0</jackson.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <logback.version>1.4.13</logback.version>
+        <snakeyaml.version>2.0</snakeyaml.version>
+        <lombok.version>1.18.30</lombok.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <mysql-connector.version>8.2.0</mysql-connector.version>
         <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
     </properties>
 
@@ -230,6 +235,28 @@
                 <version>${jakarta-api.version}</version>
                 <scope>provided</scope>
             </dependency>
+
+            <!-- logback -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <!-- snakeyaml -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+
+
 
         </dependencies>
     </dependencyManagement>

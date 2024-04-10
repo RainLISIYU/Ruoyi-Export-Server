@@ -53,6 +53,23 @@
             <artifactId>pagehelper-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- snakeyaml -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+
+        <!-- logback -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
+
         <!-- Hibernate Validator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -118,10 +135,11 @@
             <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
         </dependency>
 
+        <!-- mybatis-plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.5</version>
+            <version>${mybatis-plus.version}</version>
         </dependency>
 
     </dependencies>

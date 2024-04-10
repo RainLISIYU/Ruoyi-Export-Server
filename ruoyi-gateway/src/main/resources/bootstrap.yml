@@ -47,6 +47,6 @@ spring:
             dataId: sentinel-ruoyi-gateway
             groupId: DEFAULT_GROUP
             username: nacos
-            password: nacos
+            password: nacos123456.
             data-type: json
             rule-type: gw-flow
