@@ -30,6 +30,11 @@ public class RemoteFileFallbackFactory implements FallbackFactory<RemoteFileServ
             {
                 return R.fail("上传文件失败:" + throwable.getMessage());
             }
+
+            @Override
+            public R<SysFile> listFiles(String fileIds, String source) {
+                return R.fail("查询失败：" + throwable.getMessage());
+            }
         };
     }
 }

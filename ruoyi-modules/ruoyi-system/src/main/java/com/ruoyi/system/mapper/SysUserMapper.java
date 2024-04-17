@@ -1,5 +1,6 @@
 package com.ruoyi.system.mapper;
 
+import java.util.Collection;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import com.ruoyi.system.api.domain.SysUser;
@@ -124,4 +125,12 @@ public interface SysUserMapper
      * @return 结果
      */
     public SysUser checkEmailUnique(String email);
+
+    /**
+     * 根据用户id查询用户信息
+     *
+     * @param userIds 用户id集合
+     * @return 结果集
+     */
+    List<SysUser> getUserByIds(Collection<Long> userIds);
 }

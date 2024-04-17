@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import java.util.Collection;
 import java.util.List;
 import com.ruoyi.system.api.domain.SysUser;
 
@@ -203,4 +204,12 @@ public interface ISysUserService
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    /**
+     * 根据id查询用户信息
+     *
+     * @param userIds 用户id
+     * @return 结果集
+     */
+    List<SysUser> getUserByIds(Collection<Long> userIds);
 }

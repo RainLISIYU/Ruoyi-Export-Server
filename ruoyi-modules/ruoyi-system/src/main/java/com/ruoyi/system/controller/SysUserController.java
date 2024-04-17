@@ -1,6 +1,8 @@
 package com.ruoyi.system.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -8,14 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -147,6 +142,23 @@ public class SysUserController extends BaseController
             return R.fail("保存用户'" + username + "'失败，注册账号已存在");
         }
         return R.ok(userService.registerUser(sysUser));
+    }
+
+    @InnerAuth
+    @GetMapping("/listUser")
+    public R<List<LoginUser>> listUser(@RequestParam Collection<Long> userIds){
+        if (userIds.isEmpty()) {
+            return R.ok();
+        }
+        List<SysUser> users = userService.getUserByIds(userIds);
+        List<LoginUser> loginUsers = new ArrayList<>();
+        for (SysUser user : users){
+            LoginUser loginUser = new LoginUser();
+            loginUser.setUserid(user.getUserId());
+            loginUser.setUsername(user.getUserName());
+            loginUsers.add(loginUser);
+        }
+        return R.ok(loginUsers);
     }
 
     /**

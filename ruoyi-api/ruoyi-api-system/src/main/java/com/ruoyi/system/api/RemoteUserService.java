@@ -1,17 +1,16 @@
 package com.ruoyi.system.api;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.constant.ServiceNameConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.factory.RemoteUserFallbackFactory;
 import com.ruoyi.system.api.model.LoginUser;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 用户服务
@@ -40,4 +39,13 @@ public interface RemoteUserService
      */
     @PostMapping("/user/register")
     public R<Boolean> registerUserInfo(@RequestBody SysUser sysUser, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+    /**
+     * 根据用户id查询用户名称
+     *
+     * @param userIds 用户id集合
+     * @return 用户结果集
+     */
+    @GetMapping("/user/listUser")
+    public R<List<LoginUser>> listUser(@RequestParam("userIds") Collection<Long> userIds, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }

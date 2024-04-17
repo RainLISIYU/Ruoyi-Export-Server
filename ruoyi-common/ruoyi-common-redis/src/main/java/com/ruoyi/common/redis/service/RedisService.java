@@ -234,6 +234,19 @@ public class RedisService
     }
 
     /**
+     * Hash自增
+     *
+     * @param key Redis键
+     * @param hKey Hash键
+     * @param num 自增间隔
+     * @return 自增后的对象
+     */
+    public Long incrMapValue(final String key, final String hKey, Long num)
+    {
+        return redisTemplate.opsForHash().increment(key, hKey, num);
+    }
+
+    /**
      * 获取多个Hash中的数据
      *
      * @param key Redis键

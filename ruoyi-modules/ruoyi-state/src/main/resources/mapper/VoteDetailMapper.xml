@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.state.mapper.VoteDetailMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.state.domain.VoteDetail">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="subjectId" column="subject_id" jdbcType="BIGINT"/>
+            <result property="optionId" column="option_id" jdbcType="BIGINT"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="voteDate" column="vote_date" jdbcType="TIMESTAMP"/>
+            <result property="deletedAt" column="deleted_at" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,subject_id,option_id,
+        user_id,vote_date,deleted_at
+    </sql>
+    <select id="countBySubjectId" resultType="java.util.Map">
+        SELECT
+            option_id AS optionId,
+            count( 1 ) AS optionNum
+        FROM
+            vote_detail
+        WHERE
+            subject_id = #{subjectId}
+        GROUP BY
+            option_id
+    </select>
+</mapper>

@@ -3,6 +3,7 @@ package com.ruoyi.file.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +11,8 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.utils.file.FileUtils;
 import com.ruoyi.file.service.ISysFileService;
 import com.ruoyi.system.api.domain.SysFile;
+
+import java.util.List;
 
 /**
  * 文件请求处理
@@ -44,5 +47,10 @@ public class SysFileController
             log.error("上传文件失败", e);
             return R.fail(e.getMessage());
         }
+    }
+
+    @GetMapping("listFiles")
+    public R<SysFile> listFiles(String fileIds){
+        return R.ok();
     }
 }

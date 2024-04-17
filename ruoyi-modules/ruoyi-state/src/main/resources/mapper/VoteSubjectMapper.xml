@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.state.mapper.VoteSubjectMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.state.domain.VoteSubject">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="subjectName" column="subject_name" jdbcType="VARCHAR"/>
+            <result property="beginDate" column="begin_date" jdbcType="TIMESTAMP"/>
+            <result property="endDate" column="end_date" jdbcType="TIMESTAMP"/>
+            <result property="deletedAt" column="deleted_at" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,subject_name,begin_date,
+        end_date,deleted_at
+    </sql>
+</mapper>
