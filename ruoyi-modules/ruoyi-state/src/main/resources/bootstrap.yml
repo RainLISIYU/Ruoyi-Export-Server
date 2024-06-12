@@ -3,7 +3,7 @@ server:
   port: 9212
 
 # Spring
-spring: 
+spring:
   application:
     # 应用名称
     name: ruoyi-state
@@ -33,3 +33,5 @@ spring:
         #用户名密码
         username: nacos
         password: nacos123456.
+seata:
+  access-key: test

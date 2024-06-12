@@ -2,6 +2,7 @@ package com.ruoyi.gateway.service.impl;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
@@ -118,5 +119,10 @@ public class ValidateCodeServiceImpl implements ValidateCodeService
         {
             throw new CaptchaException("验证码错误");
         }
+    }
+
+    public static void main(String[] args) {
+        int num = 0100;
+        System.out.println(num);
     }
 }
