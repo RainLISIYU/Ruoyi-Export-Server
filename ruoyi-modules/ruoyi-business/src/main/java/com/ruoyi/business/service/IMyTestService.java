@@ -1,6 +1,7 @@
 package com.ruoyi.business.service;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.business.domain.MyTest;
@@ -27,7 +28,7 @@ public interface IMyTestService extends IService<MyTest>
      * @param myTest 测试
      * @return 测试集合
      */
-    public List<MyTest> selectMyTestList(MyTest myTest);
+    public Future<List<MyTest>> selectMyTestList(MyTest myTest);
 
     /**
      * 新增测试

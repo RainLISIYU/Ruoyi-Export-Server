@@ -46,4 +46,49 @@ public class RunTest {
         }
     }
 
+    interface DutyLink {
+
+        void handler();
+    }
+
+    static class DutyOne implements DutyLink {
+
+        private DutyLink next;
+
+        public DutyOne(DutyLink next) {
+            this.next = next;
+        }
+
+        @Override
+        public void handler() {
+            System.out.println("任务1");
+            if (this.next != null) {
+                next.handler();
+            }
+        }
+    }
+
+    static class DutyTwo implements DutyLink {
+
+        private DutyLink next;
+
+        public DutyTwo (DutyLink next) {
+            this.next = next;
+        }
+
+        @Override
+        public void handler() {
+            System.out.println("任务2");
+            if (next != null) {
+                next.handler();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        DutyLink dutyTwo = new RunTest.DutyTwo(null);
+        DutyLink dutyOne = new RunTest.DutyOne(dutyTwo);
+        dutyOne.handler();
+    }
+
 }

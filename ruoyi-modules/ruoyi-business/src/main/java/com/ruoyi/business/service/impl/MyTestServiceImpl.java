@@ -3,10 +3,14 @@ package com.ruoyi.business.service.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import com.ruoyi.business.mapper.MyTestMapper;
 import com.ruoyi.business.domain.MyTest;
@@ -42,11 +46,13 @@ public class MyTestServiceImpl extends ServiceImpl<MyTestMapper, MyTest> impleme
      * @param myTest 测试
      * @return 测试
      */
+    @Async
     @Override
-    public List<MyTest> selectMyTestList(MyTest myTest)
+    public Future<List<MyTest>> selectMyTestList(MyTest myTest)
     {
 //        return myTestMapper.selectMyTestList(myTest);
-        return this.list();
+        System.out.println(Thread.currentThread().getName());
+        return CompletableFuture.supplyAsync(this::list);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.ruoyi.business.controller;
 
 import java.util.List;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -39,10 +40,9 @@ public class MyTestController extends BaseController
      */
     @RequiresPermissions("business:test:list")
     @GetMapping("/list")
-    public TableDataInfo list(MyTest myTest)
-    {
+    public TableDataInfo list(MyTest myTest) throws ExecutionException, InterruptedException {
         startPage();
-        List<MyTest> list = myTestService.selectMyTestList(myTest);
+        List<MyTest> list = myTestService.selectMyTestList(myTest).get();
         return getDataTable(list);
     }
 
@@ -52,9 +52,8 @@ public class MyTestController extends BaseController
     @RequiresPermissions("business:test:export")
     @Log(title = "测试", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, MyTest myTest)
-    {
-        List<MyTest> list = myTestService.selectMyTestList(myTest);
+    public void export(HttpServletResponse response, MyTest myTest) throws ExecutionException, InterruptedException {
+        List<MyTest> list = myTestService.selectMyTestList(myTest).get();
         ExcelUtil<MyTest> util = new ExcelUtil<MyTest>(MyTest.class);
         util.exportExcel(response, list, "测试数据");
     }
