@@ -42,3 +42,27 @@ export function delTest(id) {
     method: 'delete'
   })
 }
+
+// 发送消息
+export function sendMsg(msg) {
+  return request({
+    url: '/business/direct/producer/sendDirectMessage?msg=' + msg,
+    method: 'get'
+  })
+}
+
+// 发送topic消息1
+export function sendTopicMsgFirst(msg) {
+  return request({
+    url: '/business/direct/producer/sendTopicMessageFirst?msg=' + msg,
+    method: 'get'
+  })
+}
+
+// 发送topic消息2
+export function sendTopicMsgSecond(msg) {
+  return request({
+    url: '/business/direct/producer/sendTopicMessageSecond?msg=' + msg,
+    method: 'get'
+  })
+}

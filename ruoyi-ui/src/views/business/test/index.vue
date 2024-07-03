@@ -13,6 +13,35 @@
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
+
+      <el-form-item label="direct消息内容" prop="msg">
+        <el-input
+          v-model="msg"
+          placeholder="请输入消息内容"
+          clearable
+          @keyup.enter.native="handleSend"
+        />
+      </el-form-item>
+      <el-form-item label="topic1消息内容" prop="msg">
+        <el-input
+          v-model="msg"
+          placeholder="请输入消息内容"
+          clearable
+          @keyup.enter.native="handleSendTopic(1)"
+        />
+      </el-form-item>
+      <el-form-item label="topic2消息内容" prop="msg">
+        <el-input
+          v-model="msg"
+          placeholder="请输入消息内容"
+          clearable
+          @keyup.enter.native="handleSendTopic(2)"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-send" size="mini" @click="handleSend">发送</el-button>
+      </el-form-item>
+
     </el-form>
 
     <el-row :gutter="10" class="mb8">
@@ -113,7 +142,7 @@
 </template>
 
 <script>
-import { listTest, getTest, delTest, addTest, updateTest } from "@/api/business/test";
+import { listTest, getTest, delTest, addTest, updateTest, sendMsg, sendTopicMsgFirst, sendTopicMsgSecond } from "@/api/business/test";
 
 export default {
   name: "Test",
@@ -144,6 +173,8 @@ export default {
         name: null,
         address: null
       },
+      //消息内容
+      msg: "",
       // 表单参数
       form: {},
       // 表单校验
@@ -177,6 +208,25 @@ export default {
         address: null
       };
       this.resetForm("form");
+    },
+    /** 发送消息 */
+    handleSend() {
+      sendMsg(this.msg).then(response => {
+        this.$modal.msgSuccess("发送成功");
+      });
+    },
+    /** 发送topic类型消息 */
+    handleSendTopic(flag) {
+      if (flag === 1) {
+        sendTopicMsgFirst(this.msg).then(response => {
+          this.$modal.msgSuccess("发送成功");
+        });
+      }else {
+        sendTopicMsgSecond(this.msg).then(response => {
+          this.$modal.msgSuccess("发送成功");
+        });
+      }
+
     },
     /** 搜索按钮操作 */
     handleQuery() {
