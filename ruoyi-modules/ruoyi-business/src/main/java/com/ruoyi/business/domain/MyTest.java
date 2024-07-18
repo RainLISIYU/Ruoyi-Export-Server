@@ -1,9 +1,16 @@
 package com.ruoyi.business.domain;
 
+import com.baomidou.mybatisplus.annotation.Version;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.core.annotation.Excel;
 import com.ruoyi.common.core.web.domain.BaseEntity;
+
+import java.io.Serial;
 
 /**
  * 测试对象 my_test
@@ -11,8 +18,11 @@ import com.ruoyi.common.core.web.domain.BaseEntity;
  * @author ruoyi
  * @date 2024-03-14
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class MyTest extends BaseEntity
 {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** 主键 */
@@ -29,41 +39,8 @@ public class MyTest extends BaseEntity
     @Excel(name = "删除标识")
     private Integer deletedAt;
 
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setName(String name) 
-    {
-        this.name = name;
-    }
-
-    public String getName() 
-    {
-        return name;
-    }
-    public void setAddress(String address) 
-    {
-        this.address = address;
-    }
-
-    public String getAddress() 
-    {
-        return address;
-    }
-
-    public Integer getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(Integer deletedAt) {
-        this.deletedAt = deletedAt;
-    }
+    @Version
+    private Integer version;
 
     @Override
     public String toString() {

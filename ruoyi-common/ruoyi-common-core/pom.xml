@@ -35,12 +35,6 @@
             <artifactId>spring-context-support</artifactId>
         </dependency>
 
-        <!-- Spring Web -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-        </dependency>
-
         <!-- Transmittable ThreadLocal -->
         <dependency>
             <groupId>com.alibaba</groupId>

@@ -2,8 +2,11 @@ package com.ruoyi.business.controller;
 
 import java.util.List;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
+import com.ruoyi.common.security.annotation.RequiresLimitation;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -87,7 +90,45 @@ public class MyTestController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody MyTest myTest)
     {
-        return toAjax(myTestService.updateMyTest(myTest));
+        Long id = myTest.getId();
+        if (Objects.isNull(id)) {
+            return error("参数异常");
+        }
+        MyTest myTestEntity = myTestService.getById(id);
+        if (Objects.isNull(myTestEntity)) {
+            return error("数据异常");
+        }
+        myTest.setVersion(myTestEntity.getVersion());
+        int updateNum = myTestService.updateMyTest(myTest);
+        if (updateNum == 0) {
+            return error("更新异常，请稍后重试！");
+        }
+        return toAjax(updateNum);
+    }
+
+    /**
+     * 接口测试
+     *
+     * @param myTest 参数
+     * @return 响应
+     */
+    @RequiresLimitation(value = "id", time = 1500)
+    @PutMapping("/updateSync")
+    public AjaxResult updateSync(@RequestBody MyTest myTest) {
+        Long id = myTest.getId();
+        if (Objects.isNull(id)) {
+            return error("id不能为空");
+        }
+        MyTest myTestEntity = myTestService.getById(id);
+        if (Objects.isNull(myTestEntity)) {
+            return error("数据异常");
+        }
+        myTest.setVersion(myTestEntity.getVersion());
+        int updateNum = myTestService.updateMyTest(myTest);
+        if (updateNum == 0) {
+            return error("更新异常，请稍后重试！");
+        }
+        return toAjax(updateNum);
     }
 
     /**

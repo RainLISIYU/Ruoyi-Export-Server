@@ -18,6 +18,8 @@
         <module>ruoyi-common-datascope</module>
         <module>ruoyi-common-datasource</module>
         <module>ruoyi-common-mq</module>
+        <module>ruoyi-common-es</module>
+        <module>ruoyi-common-netty</module>
     </modules>
 
     <artifactId>ruoyi-common</artifactId>
