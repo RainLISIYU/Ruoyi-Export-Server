@@ -73,7 +73,6 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-mq</artifactId>
-            <version>3.6.3</version>
         </dependency>
 
         <!-- RuoYi Common Log -->
