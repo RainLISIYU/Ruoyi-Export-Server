@@ -4,15 +4,19 @@ package com.ruoyi.common.netty;/*
  */
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.BootstrapConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.logging.LoggingHandler;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author lsy
@@ -45,13 +49,22 @@ public class NettyClient {
                     bootstrap = new Bootstrap();
                     //设置线程模型
                     bootstrap
-                            .group(new NioEventLoopGroup())
+                            .group(new NioEventLoopGroup(new ThreadFactory() {
+
+                                private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+                                @Override
+                                public Thread newThread(Runnable r) {
+                                    return new Thread(r, "[NIO-Thread-" + threadNumber.getAndIncrement() + "]");
+                                }
+                            }))
                             .channel(NioSocketChannel.class)
                             .handler(new ChannelInitializer<>() {
                                 @Override
                                 protected void initChannel(Channel ch) {
                                     ChannelPipeline pipeline = ch.pipeline();
-                                    pipeline.addLast(new ClientChannelHandler(NettyClient.this));
+                                    pipeline.addLast(new ClientChannelHandler(NettyClient.this))
+                                            .addLast(new LoggingHandler());
                                 }
                             });
                 }
@@ -65,6 +78,12 @@ public class NettyClient {
     public void connect() {
 
         initBoostrap();
+        //判断连接是否断开
+        BootstrapConfig config = bootstrap.config();
+        boolean shutdown = config.group().isShuttingDown();
+        if (shutdown) {
+            return;
+        }
         //连接服务器
         ChannelFuture connect = bootstrap.connect(host, port).addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {

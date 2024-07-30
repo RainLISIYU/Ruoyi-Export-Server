@@ -7,6 +7,11 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
+
+import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author lsy
@@ -38,8 +43,10 @@ public class NettyServer {
                         protected void initChannel(Channel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
 //                            pipeline.addLast(new DelimiterBasedFrameDecoder(8192, Unpooled.wrappedBuffer("\r\n".getBytes())));
-                            pipeline.addLast(new LineBasedFrameDecoder(8192));
-                            pipeline.addLast(new ServerChannelHandler());
+//                            pipeline.addLast(new LineBasedFrameDecoder(8192));
+                            pipeline.addLast(new IdleStateHandler(3, 0, 0, TimeUnit.SECONDS))
+                                    .addLast(new ServerChannelHandler())
+                                    .addLast(new LoggingHandler());
                         }
                     });
 
@@ -47,7 +54,8 @@ public class NettyServer {
             ChannelFuture future = serverBootstrap.bind(SERVER_PORT);
             try {
                 future.sync();
-                System.out.println("Netty Server Started");
+                LocalDate localDate = LocalDate.parse("2024-06-12");
+                System.out.println(localDate.withDayOfMonth(21) + "-Netty Server Started");
                 //阻塞接收消息
                 future.channel().closeFuture().sync();
             }catch (InterruptedException e) {
