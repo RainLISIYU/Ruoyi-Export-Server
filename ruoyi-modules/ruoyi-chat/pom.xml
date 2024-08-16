@@ -109,6 +109,12 @@
             <version>${lombok.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.lsy</groupId>
+            <artifactId>crypto-lib</artifactId>
+            <version>1.0</version>
+        </dependency>
+
 
     </dependencies>
 
