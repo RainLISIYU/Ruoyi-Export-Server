@@ -69,7 +69,7 @@ public class RabbitTestController {
     public String sendTopicMessageSecond(@RequestParam String msg) {
         Map<String, Object> map = geneMapParam(msg);
         CorrelationData correlationData = new CorrelationData(String.valueOf(map.get("uuid")));
-        rabbitTemplate.convertAndSend(TopicRabbitConfig.TOPIC_EXCHANGE, "test .second", JSON.toJSONString(map), correlationData);
+        rabbitTemplate.convertAndSend(TopicRabbitConfig.TOPIC_EXCHANGE, "test.second", JSON.toJSONString(map), correlationData);
         return "ok";
     }
 

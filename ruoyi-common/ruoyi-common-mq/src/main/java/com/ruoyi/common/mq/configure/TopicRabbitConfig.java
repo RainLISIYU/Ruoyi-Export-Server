@@ -21,9 +21,13 @@ public class TopicRabbitConfig {
 
     public static final String TOPIC_SECOND_QUEUE = "TestTopicQueueSecond";
 
+    public static final String TOPIC_THIRD_QUEUE = "TestTopicQueueThird";
+
     public static final String TOPIC_FIRST_KEY = "test.first";
 
     public static final String TOPIC_SECOND_KEY = "test.#";
+
+    public static final String TOPIC_THIRD_KEY = "iot_send";
 
 
 
@@ -45,6 +49,16 @@ public class TopicRabbitConfig {
     @Bean
     public Queue topicQueueFirst() {
         return new Queue(TOPIC_FIRST_QUEUE);
+    }
+
+    /**
+     * 队列3
+     *
+     * @return 队列3
+     */
+    @Bean
+    public Queue topicQueueThird() {
+        return new Queue(TOPIC_THIRD_QUEUE);
     }
 
     /**
@@ -77,6 +91,17 @@ public class TopicRabbitConfig {
     public Binding bindingExchangeSecond() {
         return BindingBuilder.bind(topicQueueSecond())
                 .to(topicExchange()).with(TOPIC_SECOND_KEY);
+    }
+
+    /**
+     * 绑定queue3
+     *
+     * @return 绑定队列3
+     */
+    @Bean
+    public Binding bindingExchangeThird() {
+        return BindingBuilder.bind(topicQueueThird())
+                .to(topicExchange()).with(TOPIC_THIRD_KEY);
     }
 
 

@@ -1,6 +1,7 @@
 package com.ruoyi.common.mq.configure;
 
 import jakarta.annotation.Resource;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.ReturnedMessage;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -30,6 +31,8 @@ public class RabbitmqConfirmCallback implements RabbitTemplate.ConfirmCallback, 
 
     @Override
     public void returnedMessage(ReturnedMessage returned) {
+        Message message = returned.getMessage();
+        message.getMessageProperties().getHeader("");
         String body = new String(returned.getMessage().getBody());
         jdbcTemplate.execute("INSERT INTO rabbit_log (body) values ('" + body + "')");
         System.out.println("消息没有路由到队列");
