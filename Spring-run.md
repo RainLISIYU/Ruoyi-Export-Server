@@ -7,8 +7,10 @@
     * 设置ApplicationListener
     * 推断main方法所在类
 2. SpringApplication.run()
-   * 创建bootstrapContext
-   * 获取springApplicationRunListeners，初始化EventPublishRunListener，保存初始化获取的listener
+   * **方法createBootstrapContext()** : 创建bootstrapContext。遍历每个BootstrapRegistryInitializer（cloud中的RefreshBootstrapRegistryInitializer和TextEncryptorConfigBootstrapper），执行initialize方法。
+     * RefreshBootstrapRegistryInitializer添加closeListener。
+     * TextEncryptorConfigBootstrapper文本加密配置初始化。
+   * **方法getRunListeners()** : 从META-INF/spring.factories中获取配置的springApplicationRunListener(boot中的EventPublishingRunListener)，初始化EventPublishRunListener等，使用listeners初始化SpringApplicationRunListeners。
    * 启动监听器，执行SpringApplicationRunListener的staring方法，启动ApplicationListener（执行onApplicationEvent）。
    * 初始化ApplicationArguments
    * 打印banner

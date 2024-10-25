@@ -57,6 +57,13 @@
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
 
+        <!--  RuoYi Common elasticSearch  -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-es</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
         <!-- RuoYi Common DataSource -->
         <dependency>
             <groupId>com.ruoyi</groupId>
@@ -73,6 +80,7 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-mq</artifactId>
+            <version>3.6.3</version>
         </dependency>
 
         <!-- RuoYi Common Log -->
@@ -85,12 +93,6 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-seata</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-            <version>${mybatis-plus.version}</version>
         </dependency>
 
         <!-- SpringBoot Web -->
