@@ -11,17 +11,54 @@
      * RefreshBootstrapRegistryInitializer添加closeListener。
      * TextEncryptorConfigBootstrapper文本加密配置初始化。
    * **方法getRunListeners()** : 从META-INF/spring.factories中获取配置的springApplicationRunListener(boot中的EventPublishingRunListener)，初始化EventPublishRunListener等，使用listeners初始化SpringApplicationRunListeners。
-   * 启动监听器，执行SpringApplicationRunListener的staring方法，启动ApplicationListener（执行onApplicationEvent）。
+   * **listeners.starting()** : 启动监听器，执行SpringApplicationRunListener的staring方法。
+     * refreshApplicationListeners方法，获取SpringApplication中的listeners，添加到AbstractApplicationEventMulticaster中的defaultRetriever.applicationListeners中。
+     * starting方法调用multicastEvent，获取对应类型（EventType:ApplicationStartingEvent，sourceType:SpringApplication）的ApplicationListener。启动ApplicationListener（执行onApplicationEvent）。
    * 初始化ApplicationArguments
+   * **prepareEnvironment()** : 获取配置环境ConfigurableEnvironment（cloud的ApplicationReactiveWebEnvironment，boot的SpringApplicationEnvironment）。
+     * listeners.environmentPrepared方法，获取事件类型为ApplicationEnvironmentPreparedEvent，用于获取系统配置或配置文件配置。
+     * cloud中BootstrapApplicationListener会创建SpringApplicationBuilder并执行run方法，初始化Bootstrap容器，加载bootstrap相关配置。 Bootstrap容器启动完成后，设置为当前容器的父容器，合并配置，返回bootstrap容器。
+     * boot中的ConfigDataEnvironmentPostProcessor读取配置文件中的配置流程：监听器EnvironmentPostProcessorApplicationListener执行onApplicationEvent，通过成员变量postProcessorFactory获取EnvironmentPostProcessor（包括ConfigDataEnvironmentPostProcessor）,遍历EnvironmentPostProcessor并执行postProcessEnvironment方法。
    * 打印banner
    * 根据项目类型创建ApplicationContext，设置ApplicationStartup
-   * spring容器前置处理，设置环境，执行ApplicationContext的initialize，加载BootstrapImportSelectorConfiguration到beanDefinition（自动装配用到）,通知监听器容器就绪
+   * **方法prepareContext()** : spring容器前置处理
+     * 设置环境
+     * 设置ConversionService
+     * 执行ApplicationContext的initialize，添加初始化器到应用上下文
+     * listeners.contextPrepared，执行事件类型（ApplicationContextInitializedEvent），LoggingApplicationListener执行onApplicationPreparedEvent，注册log相关类。
+     * 获取beanFactory，注册相关单例类
+     * listeners.contextLoaded，执行事件类型（ApplicationPreparedEvent）
    * 刷新容器
-     * 刷新前准备  - 设置环境
+     * 刷新前准备prepareRefresh方法
+       1. initPropertySources方法：啥也没干
+       2. getEnvironment().validateRequireProperties()：获取requiredProperties的配置，实际啥也没干
+       3. 将初始的ApplicationListeners设置到earlyApplicationListeners
      * 获取BeanFactory
-     * 扩展BeanFactory功能
+     * 扩展BeanFactory功能，设置beanClassLoader等需要的bean
      * postProcessBeanFactory - 空方法
-     * 激活BeanFactoryPostProcessors，执行BeanDefinitionRegistryPostProcessor的postProcessBeanDefinitionRegistry，执行BeanFactoryPostProcessor中的postProcessBeanFactory。
+     * invokeBeanFactoryPostProcessors(beanFactory)：
+       1. 获取BeanFactoryPostProcessors，区分BeanDefinitionRegistryPostProcessor（添加于registryProcessors中）和BeanFactoryPostProcessor（添加到regularPostProcessors中）。
+       2. 获取ConfigurationClassPostProcessor，添加到registryProcessors中，并作为参数执行invokeBeanDefinitionRegistryPostProcessors方法，调用其postProcessBeanDefinitionRegistry方法。
+          * 获取ConfigurationClassParser并执行parse方法。
+            * （默认启动类包下），排查过滤器，beanDefinition中默认lazyInit配置等。
+            * 执行ClassPath通过ClassPathBeanDefinitionScanner设置扫描路径eanDefinitionScanner.doScan扫描获取beanDefinition，处理为BeanDefinitionHolder，注册到beanFactory的beanDefinitionMap中，key为beanName，value为BeanDefinition。
+            * 后续处理扫描到的Set<BeanDefinitonHolder>，源码注释(递归处理扫描到的类)-Check the set of scanned definitions for any further config classes and parse recursively if needed
+            * processImport处理@Import注解类，3类：ImportBeanDefinitionRegistrar、ImportSelector、其他，记录相关配置类。
+            * 检索所有@Bean方法
+            * 上面步骤为子parse方法中流程，扫描需注入的实体，后续执行this.deferredImportSelectorHandler.process()处理ImportSelector（自动配置的AutoConfigurationImportSelector）
+            * 一系列处理后调用AutoConfigurationImportSelector.process() -> ConfigurationClassParser.processGroupImports() -> grouping.getImports() -> AutoConfigurationImportSelector.process() -> getAutoConfigurationEntry()获取所有自动配置类。
+            * getAttributes获取注解类全名，getCandidateConfigurations从META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports路径下获取所有自动配置类。
+            * removeDuplicates去除重复配置类，根据onBeanCondition、onClassCondition、onWebApplicationCondition过滤配置类，输出boolean[]，false将配置类数组对应位置置空，重新构造一个配置类数组，去除不满足的配置类。
+            * fireAutoConfigurationImportEvents获取监听器AutoConfigurationImportListener，广播AutoConfigurationImportEvent事件。
+            * 遍历并处理获取的所有配置类，添加到ConfigurationClassParser中的configurationClasses中。
+          * reader.loadBeanDefinitions(configClasses)，处理自动配置类，注册beanDefinition到beanFactory。
+          * 调用其他BeanDefinitionRegistryPostProcessor，eg:MapperScannerConfigurer，扫描mapperScan配置路径下的mapper接口，注册beanDefinition到beanFactory。
+          * 获取扫描bean里面中的BeanFactoryPostProcessor。
+            * PropertySourcesPlaceholderConfigurer：处理配置文件中的占位符${}，代码没看出干了啥，解析beanDefinition中的PropertyValues和constructorArgumentValues中的占位符。
+            * DatabaseInitializationDependencyConfigurer：
+       3. invokeBeanFactoryPostProcessors()：调用BeanFactoryPostProcessor的postProcessBeanFactory方法。
+          * ConfigurationClassPostProcessor.postProcessBeanFactory：获取扫描到bean中的@Configuration修饰的类，使用spring cglib进行增强，替换原beanClass。
+       3. 激活BeanFactoryPostProcessors，执行BeanDefinitionRegistryPostProcessor的postProcessBeanDefinitionRegistry，执行BeanFactoryPostProcessor中的postProcessBeanFactory。
      * 注册beanPostProcessors，调佣beanFactory.addBeanPostProcessor(s)注册
      * beanPostProcess.end - 空方法
      * 初始化Message资源 
