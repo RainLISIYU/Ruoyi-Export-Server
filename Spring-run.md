@@ -40,32 +40,46 @@
        1. 获取BeanFactoryPostProcessors，区分BeanDefinitionRegistryPostProcessor（添加于registryProcessors中）和BeanFactoryPostProcessor（添加到regularPostProcessors中）。
        2. 获取ConfigurationClassPostProcessor，添加到registryProcessors中，并作为参数执行invokeBeanDefinitionRegistryPostProcessors方法，调用其postProcessBeanDefinitionRegistry方法。
           * 获取ConfigurationClassParser并执行parse方法。
-            * （默认启动类包下），排查过滤器，beanDefinition中默认lazyInit配置等。
-            * 执行ClassPath通过ClassPathBeanDefinitionScanner设置扫描路径eanDefinitionScanner.doScan扫描获取beanDefinition，处理为BeanDefinitionHolder，注册到beanFactory的beanDefinitionMap中，key为beanName，value为BeanDefinition。
+            * 进入ComponentScanAnnotationParser.parse方法，初始化ClassPathBeanDefinitionScanner，设置所需参数。
+            * 执行ClassPathBeanDefinitionScanner.doScan()，扫描ComponentScan路径下所有class文件，判断哪些类需要注册为BeanDefinition，例如：注解@Componenet，@Configuration，是否跳过ConditionOn等。
+            * 获取beanDefinition，处理为BeanDefinitionHolder，注册到beanFactory的beanDefinitionMap中，key为beanName，value为BeanDefinition。
             * 后续处理扫描到的Set<BeanDefinitonHolder>，源码注释(递归处理扫描到的类)-Check the set of scanned definitions for any further config classes and parse recursively if needed
             * processImport处理@Import注解类，3类：ImportBeanDefinitionRegistrar、ImportSelector、其他，记录相关配置类。
             * 检索所有@Bean方法
-            * 上面步骤为子parse方法中流程，扫描需注入的实体，后续执行this.deferredImportSelectorHandler.process()处理ImportSelector（自动配置的AutoConfigurationImportSelector）
-            * 一系列处理后调用AutoConfigurationImportSelector.process() -> ConfigurationClassParser.processGroupImports() -> grouping.getImports() -> AutoConfigurationImportSelector.process() -> getAutoConfigurationEntry()获取所有自动配置类。
-            * getAttributes获取注解类全名，getCandidateConfigurations从META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports路径下获取所有自动配置类。
-            * removeDuplicates去除重复配置类，根据onBeanCondition、onClassCondition、onWebApplicationCondition过滤配置类，输出boolean[]，false将配置类数组对应位置置空，重新构造一个配置类数组，去除不满足的配置类。
-            * fireAutoConfigurationImportEvents获取监听器AutoConfigurationImportListener，广播AutoConfigurationImportEvent事件。
-            * 遍历并处理获取的所有配置类，添加到ConfigurationClassParser中的configurationClasses中。
+            * 执行this.deferredImportSelectorHandler.process()处理ImportSelector（自动配置的AutoConfigurationImportSelector）
+              * 一系列处理后调用AutoConfigurationImportSelector.process() -> ConfigurationClassParser.processGroupImports() -> grouping.getImports() -> AutoConfigurationImportSelector.process() -> getAutoConfigurationEntry()获取所有自动配置类。
+              * getAttributes获取注解类全名，getCandidateConfigurations从META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports路径下获取所有自动配置类。
+              * removeDuplicates去除重复配置类，根据onBeanCondition、onClassCondition、onWebApplicationCondition过滤配置类，输出boolean[]，false将配置类数组对应位置置空，重新构造一个配置类数组，去除不满足的配置类。
+              * fireAutoConfigurationImportEvents获取监听器AutoConfigurationImportListener，广播AutoConfigurationImportEvent事件。
+              * 遍历并处理获取的所有配置类，添加到ConfigurationClassParser中的configurationClasses中。
           * reader.loadBeanDefinitions(configClasses)，处理自动配置类，注册beanDefinition到beanFactory。
-          * 调用其他BeanDefinitionRegistryPostProcessor，eg:MapperScannerConfigurer，扫描mapperScan配置路径下的mapper接口，注册beanDefinition到beanFactory。
-          * 获取扫描bean里面中的BeanFactoryPostProcessor。
-            * PropertySourcesPlaceholderConfigurer：处理配置文件中的占位符${}，代码没看出干了啥，解析beanDefinition中的PropertyValues和constructorArgumentValues中的占位符。
-            * DatabaseInitializationDependencyConfigurer：
-       3. invokeBeanFactoryPostProcessors()：调用BeanFactoryPostProcessor的postProcessBeanFactory方法。
-          * ConfigurationClassPostProcessor.postProcessBeanFactory：获取扫描到bean中的@Configuration修饰的类，使用spring cglib进行增强，替换原beanClass。
-       3. 激活BeanFactoryPostProcessors，执行BeanDefinitionRegistryPostProcessor的postProcessBeanDefinitionRegistry，执行BeanFactoryPostProcessor中的postProcessBeanFactory。
-     * 注册beanPostProcessors，调佣beanFactory.addBeanPostProcessor(s)注册
+       3. 获取beanDefinition中的BeanDefinitionRegistryPostProcessor，并调用其postProcessBeanDefinitionRegistry，eg:MapperScannerConfigurer，扫描mapperScan配置路径下的mapper接口，注册beanDefinition到beanFactory。
+       4. invokeBeanFactoryPostProcessors()：调用BeanFactoryPostProcessor的postProcessBeanFactory方法。
+           * ConfigurationClassPostProcessor.postProcessBeanFactory：获取扫描到bean中的@Configuration修饰的类，使用spring cglib进行增强，替换原beanClass。
+       5. 获取扫描beanDefinition里面的BeanFactoryPostProcessor，调用postProcessBeanFactory方法。
+          * PropertySourcesPlaceholderConfigurer：处理配置文件中的占位符${}，代码没看出干了啥，解析beanDefinition中的PropertyValues和constructorArgumentValues中的占位符。
+          * DatabaseInitializationDependencyConfigurer：
+          * 执行其他无序的BeanFactoryProcessor。
+          * clearMetadataCache：清理元数据缓存
+     * registerBeanPostProcessors()：调佣beanFactory.addBeanPostProcessor()注册
      * beanPostProcess.end - 空方法
      * 初始化Message资源 
      * 初始化事件广播器
-     * onRefresh - 空方法
+     * onRefresh：初始化内置tomcat。[具体步骤参考](https://baijiahao.baidu.com/s?id=1713418691466074756&wfr=spider&for=pc)
      * 注册监听器，将初始化中获取的监听器添加到事件广播器中，获取beanFactory中的监听器并添加到事件监听器
-     * 实例化非懒加载单例类 - 实例化后会执行InitializingBean接口方法和处理PostConstruct
+     * finishBeanFactoryInitialization方法：给beanFactory设置类型转换器，数据解析器，初始化loadTimeWeaverAware，设置冻结配置。下面执行preInstantiateSingletons：开始实例化非懒加载单例类[步骤参考](https://blog.csdn.net/wh87025569/article/details/119066600) - 实例化后会执行InitializingBean接口方法和处理PostConstruct
+       1. 获取所有beanDefinitionNames，遍历，获取RootBeanDefinition（合并父类beanDefinition），判断bean为非抽象、单例、非懒加载，再判断是否为FactoryBean，是的话需特殊处理，后执行getBean。
+       2. getBean方法
+          * 处理beanName，前面有&（factoryBean）的处理掉。
+          * getSingleton(beanName)：从一二三级缓存里查询bean是否实例化。
+          * 若存在，获取bean实例
+          * 不存在，一系列判断，创建bean实例，主要方法：getSingleton(beanName, objectFactory)。
+            * 锁一级缓存，一级缓存获取bean，没有继续
+            * beforeSingletonCreation(beanName)，检查bean是否排除，并添加到singletonsCurrentlyInCreation。
+            * 调用objectFactory.getObject() -> AbstractAutowireCapableBeanFactory.createBean()：
+              1. 根据RootBeanDefinition和beanName获取class引用，生成新的RootBeanDefinition。
+              2. 执行resolveBeforeInstantiation（bean实例化前让BeanPostProcessors能够先返回bean的代理，不为空直接返回bean）。
+              3. doCreateBean()：生成BeanWrapper，先从factoryBeanInstanceCache中获取。没有则调用createBeanInstance()：先获取class对象，从beanDefinition中获取InstanceSupplier，存在从里面湖区beanWrapper，否则根据beanDefinition中的resolvedConstructorOrFactoryMethod获取，没有再通过其他方式获取构造方法。都没有最终调用instantiateBean方法，通过beanDefinition获取class对象，使用class获取构造方法，通过构造方法实例化bean，使用实例化的bean初始化BeanWrapper，设置BeanWrapper参数返回。后续处理，populateBean填充属性，initializeBean执行beanPostProcessor前置处理，initializingBean接口初始化方法，后置处理。
      * 完成刷新过程，清空资源缓存，初始化生命周期处理器，调用生命处理器的onFresh，发布最后事件
    * 容器后置处理 - afterRefresh 空方法
    * 结束执行事件

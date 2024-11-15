@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
  * @description topic模式配置类
  * @date 2024/7/2
  */
-@Configuration
 public class TopicRabbitConfig {
 
     public static final String TOPIC_EXCHANGE = "TestTopicExchange";

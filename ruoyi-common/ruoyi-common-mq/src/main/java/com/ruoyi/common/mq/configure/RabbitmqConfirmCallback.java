@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
  * @description rabbitmq自定义回调方法
  * @date 2024/6/26
  */
-@Component
 public class RabbitmqConfirmCallback implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnsCallback {
 
     @Resource

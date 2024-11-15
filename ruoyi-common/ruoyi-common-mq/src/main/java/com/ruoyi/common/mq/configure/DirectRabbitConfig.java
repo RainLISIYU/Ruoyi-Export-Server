@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
  * @description rabbitmq直连模式配置类
  * @date 2024/6/25
  */
-@Configuration
 public class DirectRabbitConfig {
 
     public static final String DIRECT_QUEUE = "TestDirectQueue";

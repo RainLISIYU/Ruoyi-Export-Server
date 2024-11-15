@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
  * @description rabbitmq基础配置类
  * @date 2024/6/26
  */
-@Component
 public class RabbitMqConfig {
 
     @Resource
