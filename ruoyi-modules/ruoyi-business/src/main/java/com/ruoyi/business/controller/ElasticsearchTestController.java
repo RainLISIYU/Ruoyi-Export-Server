@@ -3,7 +3,7 @@ package com.ruoyi.business.controller;/*
  *@Date:2024/10/22 16:26
  */
 
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+//import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 @RestController("/esTest")
 public class ElasticsearchTestController {
 
-    @Resource
-    private ElasticsearchTemplate elasticsearchTemplate;
+//    @Resource
+//    private ElasticsearchTemplate elasticsearchTemplate;
 
 }

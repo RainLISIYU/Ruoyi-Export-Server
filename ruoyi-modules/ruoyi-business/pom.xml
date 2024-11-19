@@ -58,9 +58,16 @@
         </dependency>
 
         <!--  RuoYi Common elasticSearch  -->
+<!--        <dependency>-->
+<!--            <groupId>com.ruoyi</groupId>-->
+<!--            <artifactId>ruoyi-common-es</artifactId>-->
+<!--            <version>3.6.3</version>-->
+<!--        </dependency>-->
+
+        <!-- RuoYi Activity -->
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-es</artifactId>
+            <artifactId>ruoyi-common-activity</artifactId>
             <version>3.6.3</version>
         </dependency>
 
