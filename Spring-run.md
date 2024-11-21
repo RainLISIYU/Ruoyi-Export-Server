@@ -79,7 +79,11 @@
             * 调用objectFactory.getObject() -> AbstractAutowireCapableBeanFactory.createBean()：
               1. 根据RootBeanDefinition和beanName获取class引用，生成新的RootBeanDefinition。
               2. 执行resolveBeforeInstantiation（bean实例化前让BeanPostProcessors能够先返回bean的代理，不为空直接返回bean）。
-              3. doCreateBean()：生成BeanWrapper，先从factoryBeanInstanceCache中获取。没有则调用createBeanInstance()：先获取class对象，从beanDefinition中获取InstanceSupplier，存在从里面湖区beanWrapper，否则根据beanDefinition中的resolvedConstructorOrFactoryMethod获取，没有再通过其他方式获取构造方法。都没有最终调用instantiateBean方法，通过beanDefinition获取class对象，使用class获取构造方法，通过构造方法实例化bean，使用实例化的bean初始化BeanWrapper，设置BeanWrapper参数返回。后续处理，populateBean填充属性，initializeBean执行beanPostProcessor前置处理，initializingBean接口初始化方法，后置处理。
+              3. doCreateBean()
+                 * 生成BeanWrapper，先从factoryBeanInstanceCache中获取。没有则调用createBeanInstance()：先获取class对象，从beanDefinition中获取InstanceSupplier，存在从里面湖区beanWrapper，否则根据beanDefinition中的resolvedConstructorOrFactoryMethod获取，没有再通过其他方式获取构造方法。都没有最终调用instantiateBean方法，通过beanDefinition获取class对象，使用class获取构造方法，通过构造方法实例化bean，使用实例化的bean初始化BeanWrapper，设置BeanWrapper参数返回。
+                 * 后续处理，applyMergedBeanDefinitionPostProcessor方法处理属性（eg:CommonAnnotationBeanPostProcessor.postProcessorMergedBeanDefinition获取@PostConstruct、@PreDestroy、@Resource等注解并记录）。[参考](https://blog.csdn.net/qq_35512802/article/details/132165692)
+                 * populateBean填充上面获取属性值，调用PostProcessor.postProcessProperties方法（eg：CommonAnnotationBeanPostProcessor）。
+                 * initializeBean执行beanPostProcessor前置处理，initializingBean接口初始化方法，后置处理。
      * 完成刷新过程，清空资源缓存，初始化生命周期处理器，调用生命处理器的onFresh，发布最后事件
    * 容器后置处理 - afterRefresh 空方法
    * 结束执行事件
@@ -93,7 +97,7 @@
     * src/test/java/com.ruoyi.business.test.RunTest.java
 ### 启动时执行方法
 1. ApplicationRunner和CommandLineRunner - 启动最后一步执行。
-2. InitializingBean接口 - 刷新容器过程中实例化bean时若继承接口，则执行afterPropertiesSet方法。
+2. InitializingBean接口 - 刷新容器过程中初始化bean时若继承接口，则执行afterPropertiesSet方法。
 3. @PostConstruct - 实例化时将注解方法设置为bean的init-method，实例化时通过反射调用，与上面接口处于一个方法中。
 ### 自动装配原理
 1. refresh和自动配置大体流程 - 自动配置处理逻辑主要在ConfigurationClassParser.parse中
