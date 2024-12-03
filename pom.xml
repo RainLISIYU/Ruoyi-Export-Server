@@ -19,10 +19,13 @@
         <java.version>21</java.version>
         <spring-core.version>6.0.21</spring-core.version>
         <spring-web.version>6.1.12</spring-web.version>
-        <spring-boot.version>3.0.13</spring-boot.version>
-        <spring-cloud.version>2022.0.0</spring-cloud.version>
-        <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
-        <spring-boot-admin.version>3.0.4</spring-boot-admin.version>
+<!--        <spring-boot.version>3.0.13</spring-boot.version>-->
+        <spring-boot.version>3.2.4</spring-boot.version>
+<!--        <spring-cloud.version>2022.0.0</spring-cloud.version>-->
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
+<!--        <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>-->
+        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
+        <spring-boot-admin.version>3.4.0</spring-boot-admin.version>
         <springdoc.version>2.1.0</springdoc.version>
         <tobato.version>1.27.2</tobato.version>
         <kaptcha.version>2.3.3</kaptcha.version>
@@ -49,6 +52,8 @@
         <spring-core.version>6.1.8</spring-core.version>
         <logback.version>1.5.6</logback.version>
         <commons-fileupload.version>1.5</commons-fileupload.version>
+        <maven-plugin.version>3.4.0</maven-plugin.version>
+<!--        <spring-webmvc.version>6.2.0</spring-webmvc.version>-->
     </properties>
 
     <!-- 依赖声明 -->
@@ -88,6 +93,14 @@
                 <artifactId>fastdfs-client</artifactId>
                 <version>${tobato.version}</version>
             </dependency>
+
+            <!-- spring webmvc 依赖配置 -->
+<!--            <dependency>-->
+<!--                <groupId>org.springframework</groupId>-->
+<!--                <artifactId>spring-webmvc</artifactId>-->
+<!--                <version>${spring-webmvc.version}</version>-->
+<!--            </dependency>-->
+
 
             <!-- springdoc 依赖配置 -->
             <dependency>
@@ -321,6 +334,7 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${maven-plugin.version}</version>
                     <executions>
                         <execution>
                             <goals>

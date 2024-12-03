@@ -2,8 +2,12 @@ package com.ruoyi.file.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
+
+import com.alibaba.nacos.common.utils.MD5Utils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.core.exception.file.FileException;
@@ -93,7 +97,13 @@ public class FileUploadUtils
      */
     public static final String extractFilename(MultipartFile file)
     {
-        return StringUtils.format("{}/{}_{}.{}", DateUtils.datePath(),
+        String fileMd5 = "0101";
+        try {
+            fileMd5 = MD5Utils.md5Hex(file.getName().getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        return StringUtils.format("{}/{}/{}_{}.{}", DateUtils.datePath(), fileMd5,
                 FilenameUtils.getBaseName(file.getOriginalFilename()), Seq.getId(Seq.uploadSeqType), FileTypeUtils.getExtension(file));
     }
 

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysWorkflowMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.SysWorkflow">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="file" column="file" jdbcType="VARCHAR"/>
+            <result property="deploymentId" column="deployment_id" jdbcType="VARCHAR"/>
+            <result property="needDeploy" column="need_deploy" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,file,
+        deployment_id,need_deploy
+    </sql>
+</mapper>

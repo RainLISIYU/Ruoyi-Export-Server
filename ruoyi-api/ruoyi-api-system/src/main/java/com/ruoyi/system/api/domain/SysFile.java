@@ -11,6 +11,11 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class SysFile
 {
     /**
+     * 文件id
+     */
+    private Long id;
+
+    /**
      * 文件名称
      */
     private String name;
@@ -19,6 +24,14 @@ public class SysFile
      * 文件地址
      */
     private String url;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName()
     {

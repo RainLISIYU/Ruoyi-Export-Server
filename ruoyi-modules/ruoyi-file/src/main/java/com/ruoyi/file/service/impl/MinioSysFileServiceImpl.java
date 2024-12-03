@@ -1,6 +1,11 @@
-package com.ruoyi.file.service;
+package com.ruoyi.file.service.impl;
 
 import java.io.InputStream;
+
+import com.ruoyi.file.domain.SysFilePo;
+import com.ruoyi.file.mapper.SysFileMapper;
+import com.ruoyi.file.service.ISysFileService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -19,6 +24,10 @@ import io.minio.PutObjectArgs;
 @Service
 public class MinioSysFileServiceImpl implements ISysFileService
 {
+
+    @Resource
+    private SysFileMapper sysFileMapper;
+
     @Autowired
     private MinioConfig minioConfig;
 
@@ -33,7 +42,7 @@ public class MinioSysFileServiceImpl implements ISysFileService
      * @throws Exception
      */
     @Override
-    public String uploadFile(MultipartFile file) throws Exception
+    public SysFilePo uploadFile(MultipartFile file) throws Exception
     {
         String fileName = FileUploadUtils.extractFilename(file);
         InputStream inputStream = file.getInputStream();
@@ -45,7 +54,13 @@ public class MinioSysFileServiceImpl implements ISysFileService
                 .build();
         client.putObject(args);
         IoUtils.closeQuietly(inputStream);
-        return minioConfig.getUrl() + "/" + minioConfig.getBucketName() + "/" + fileName;
+        // 保存
+        SysFilePo sysFilePo = new SysFilePo();
+        sysFilePo.setRemotePath(minioConfig.getUrl() + "/" + minioConfig.getBucketName() + "/" + fileName);
+        sysFilePo.setFileName(file.getOriginalFilename());
+        sysFilePo.setFileSize(String.valueOf(file.getSize() / 1024));
+        sysFileMapper.insert(sysFilePo);
+        return sysFilePo;
     }
 
     @Override

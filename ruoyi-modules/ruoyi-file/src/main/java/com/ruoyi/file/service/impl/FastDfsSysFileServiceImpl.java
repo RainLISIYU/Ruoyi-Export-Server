@@ -1,7 +1,11 @@
-package com.ruoyi.file.service;
+package com.ruoyi.file.service.impl;
 
 import java.io.InputStream;
 import com.alibaba.nacos.common.utils.IoUtils;
+import com.ruoyi.file.domain.SysFilePo;
+import com.ruoyi.file.mapper.SysFileMapper;
+import com.ruoyi.file.service.ISysFileService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,9 @@ import com.ruoyi.common.core.utils.file.FileTypeUtils;
 @Service
 public class FastDfsSysFileServiceImpl implements ISysFileService
 {
+    @Resource
+    private SysFileMapper sysFileMapper;
+
     /**
      * 域名或本机访问地址
      */
@@ -35,13 +42,18 @@ public class FastDfsSysFileServiceImpl implements ISysFileService
      * @throws Exception
      */
     @Override
-    public String uploadFile(MultipartFile file) throws Exception
+    public SysFilePo uploadFile(MultipartFile file) throws Exception
     {
         InputStream inputStream = file.getInputStream();
         StorePath storePath = storageClient.uploadFile(inputStream, file.getSize(),
                 FileTypeUtils.getExtension(file), null);
         IoUtils.closeQuietly(inputStream);
-        return domain + "/" + storePath.getFullPath();
+        SysFilePo sysFilePo = new SysFilePo();
+        sysFilePo.setRemotePath(domain + "/" + storePath.getFullPath());
+        sysFilePo.setFileSize(String.valueOf(file.getSize() / 1024));
+        sysFilePo.setFileName(file.getOriginalFilename());
+        sysFileMapper.insert(sysFilePo);
+        return sysFilePo;
     }
 
     @Override

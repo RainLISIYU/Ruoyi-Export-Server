@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @description 启动类
  * @date 2024/3/6
  */
-@EnableAsync
 @EnableCustomConfig
 @EnableRyFeignClients
 @SpringBootApplication

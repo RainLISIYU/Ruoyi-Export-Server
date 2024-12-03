@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.file.mapper.SysFileMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.file.domain.SysFilePo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="fileName" column="file_name" jdbcType="VARCHAR"/>
+            <result property="fileSize" column="file_size" jdbcType="VARCHAR"/>
+            <result property="remotePath" column="remote_path" jdbcType="VARCHAR"/>
+            <result property="localPath" column="local_path" jdbcType="VARCHAR"/>
+            <result property="deletedAt" column="deleted_at" jdbcType="BOOLEAN"/>
+            <result property="uploadTime" column="upload_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,file_name,file_size,
+        remote_path,local_path,deleted_at,
+        upload_time
+    </sql>
+</mapper>
