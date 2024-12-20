@@ -55,7 +55,7 @@
           * reader.loadBeanDefinitions(configClasses)，处理自动配置类，注册beanDefinition到beanFactory。
        3. 获取beanDefinition中的BeanDefinitionRegistryPostProcessor，并调用其postProcessBeanDefinitionRegistry，eg:MapperScannerConfigurer，扫描mapperScan配置路径下的mapper接口，注册beanDefinition到beanFactory。
        4. invokeBeanFactoryPostProcessors()：调用BeanFactoryPostProcessor的postProcessBeanFactory方法。
-           * ConfigurationClassPostProcessor.postProcessBeanFactory：获取扫描到bean中的@Configuration修饰的类，使用spring cglib进行增强，替换原beanClass。
+           * ConfigurationClassPostProcessor.postProcessBeanFactory：获取扫描到bean中的@Configuration修饰的类，使用spring cglib进行增强，替换原beanClass，作用为缓存创建的代理对象，使configuration保持单例。
        5. 获取扫描beanDefinition里面的BeanFactoryPostProcessor，调用postProcessBeanFactory方法。
           * PropertySourcesPlaceholderConfigurer：处理配置文件中的占位符${}，代码没看出干了啥，解析beanDefinition中的PropertyValues和constructorArgumentValues中的占位符。
           * DatabaseInitializationDependencyConfigurer：
@@ -80,8 +80,8 @@
               1. 根据RootBeanDefinition和beanName获取class引用，生成新的RootBeanDefinition。
               2. 执行resolveBeforeInstantiation（bean实例化前让BeanPostProcessors能够先返回bean的代理，不为空直接返回bean）。
               3. doCreateBean()
-                 * 生成BeanWrapper，先从factoryBeanInstanceCache中获取。没有则调用createBeanInstance()：先获取class对象，从beanDefinition中获取InstanceSupplier，存在从里面湖区beanWrapper，否则根据beanDefinition中的resolvedConstructorOrFactoryMethod获取，没有再通过其他方式获取构造方法。都没有最终调用instantiateBean方法，通过beanDefinition获取class对象，使用class获取构造方法，通过构造方法实例化bean，使用实例化的bean初始化BeanWrapper，设置BeanWrapper参数返回。
-                 * 后续处理，applyMergedBeanDefinitionPostProcessor方法处理属性（eg:CommonAnnotationBeanPostProcessor.postProcessorMergedBeanDefinition获取@PostConstruct、@PreDestroy、@Resource等注解并记录）。[参考](https://blog.csdn.net/qq_35512802/article/details/132165692)
+                 * 生成BeanWrapper，先从factoryBeanInstanceCache中获取。没有则调用createBeanInstance()：先获取class对象，从beanDefinition中获取InstanceSupplier，存在从里面获取beanWrapper，否则根据beanDefinition中的resolvedConstructorOrFactoryMethod获取，没有再通过其他方式获取构造方法。都没有最终调用instantiateBean方法，通过beanDefinition获取class对象，使用class获取构造方法，通过构造方法实例化bean，使用实例化的bean初始化BeanWrapper，设置BeanWrapper参数返回。
+                 * 后续处理，applyMergedBeanDefinitionPostProcessor方法处理属性（eg:CommonAnnotationBeanPostProcessor.postProcessorMergedBeanDefinition获取@PostConstruct、@PreDestroy、@Resource等注解并记录;AutowiredAnnotationBeanPostProcessor处理@Autowired注解）。[参考](https://blog.csdn.net/qq_35512802/article/details/132165692)
                  * populateBean填充上面获取属性值，调用PostProcessor.postProcessProperties方法（eg：CommonAnnotationBeanPostProcessor）。
                  * initializeBean执行beanPostProcessor前置处理，initializingBean接口初始化方法，后置处理。
      * 完成刷新过程，清空资源缓存，初始化生命周期处理器，调用生命处理器的onFresh，发布最后事件
