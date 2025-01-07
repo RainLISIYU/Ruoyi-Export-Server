@@ -1,12 +1,9 @@
-package com.ruoyi.business.controller;/*
- *@Author:cq
- *@Date:2024/10/22 16:26
- */
+package com.ruoyi.business.controller;
 
 //import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
+//import javax.annotation.Resource;
 
 /**
  * @author lsy

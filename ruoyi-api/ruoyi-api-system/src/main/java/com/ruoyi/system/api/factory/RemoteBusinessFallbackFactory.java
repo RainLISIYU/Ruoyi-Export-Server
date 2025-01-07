@@ -27,11 +27,6 @@ public class RemoteBusinessFallbackFactory implements FallbackFactory<RemoteBusi
     public RemoteBusinessService create(Throwable cause) {
 
         logger.error("开发服务调用失败:{}", cause.getMessage());
-        return new RemoteBusinessService() {
-            @Override
-            public R<List<SysTest>> list(String name, String source) {
-                return R.fail("测试查询失败：" + cause.getMessage());
-            }
-        };
+        return (name, source) -> R.fail("测试查询失败：" + cause.getMessage());
     }
 }

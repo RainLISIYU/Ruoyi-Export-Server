@@ -53,6 +53,7 @@
         <logback.version>1.5.6</logback.version>
         <commons-fileupload.version>1.5</commons-fileupload.version>
         <maven-plugin.version>3.4.0</maven-plugin.version>
+        <baidu-ai.version>4.16.19</baidu-ai.version>
 <!--        <spring-webmvc.version>6.2.0</spring-webmvc.version>-->
     </properties>
 

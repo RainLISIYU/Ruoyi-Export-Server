@@ -122,6 +122,13 @@
             <version>${lombok.version}</version>
         </dependency>
 
+        <!-- 百度AI -->
+        <dependency>
+            <groupId>com.baidu.aip</groupId>
+            <artifactId>java-sdk</artifactId>
+            <version>${baidu-ai.version}</version>
+        </dependency>
+
 
     </dependencies>
 
