@@ -18,4 +18,12 @@ public interface SysWorkflowService extends IService<SysWorkflow> {
      * @return 查询结果
      */
     TableDataInfo queryList(SysWorkflow workflow, String pi, String ps);
+
+    /**
+     * 部署工作流
+     *
+     * @param workflow 工作流信息
+     * @return 结果
+     */
+    Boolean deploy(SysWorkflow workflow);
 }

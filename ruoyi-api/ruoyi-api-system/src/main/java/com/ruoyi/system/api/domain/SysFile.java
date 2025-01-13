@@ -25,6 +25,11 @@ public class SysFile
      */
     private String url;
 
+    /**
+     * 本地路径
+     */
+    private String localUrl;
+
     public Long getId() {
         return id;
     }
@@ -53,11 +58,20 @@ public class SysFile
         this.url = url;
     }
 
+    public String getLocalUrl() {
+        return localUrl;
+    }
+
+    public void setLocalUrl(String localUrl) {
+        this.localUrl = localUrl;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("name", getName())
             .append("url", getUrl())
+            .append("localUrl", getLocalUrl())
             .toString();
     }
 }

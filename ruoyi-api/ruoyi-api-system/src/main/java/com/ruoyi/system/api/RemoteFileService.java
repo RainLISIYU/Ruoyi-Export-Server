@@ -3,15 +3,15 @@ package com.ruoyi.system.api;
 import com.ruoyi.common.core.constant.SecurityConstants;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.core.constant.ServiceNameConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.api.domain.SysFile;
 import com.ruoyi.system.api.factory.RemoteFileFallbackFactory;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 文件服务
@@ -36,6 +36,16 @@ public interface  RemoteFileService
      * @param fileIds 文件id集合
      * @return 结果集
      */
-    @PostMapping("/listFiles")
-    public R<SysFile> listFiles(@RequestParam("fileIds") String fileIds, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    @GetMapping("/listFiles")
+    public R<List<SysFile>> listFiles(@RequestParam("fileIds") Collection<Long> fileIds, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+    /**
+     * 根据md5查询文件信息
+     *
+     * @param md5 加密数据
+     * @param source 头部认证
+     * @return 文件信息
+     */
+    @GetMapping("listByMd5")
+    public R<List<SysFile>> listByMd5(@RequestParam("md5") String md5, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }

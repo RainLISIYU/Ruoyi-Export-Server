@@ -34,6 +34,7 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="edge-0c21a0fb-b96c-4983-bf74-28c690b1edde" bpmnElement="sid-57c12d14-4d97-49d7-9b0c-1aaae55ef63e">
         <omgdi:waypoint x="15.0" y="225.0"/>
+        <omgdi:waypoint x="14.999999" y="242.50002"/>
         <omgdi:waypoint x="15.0" y="260.0"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

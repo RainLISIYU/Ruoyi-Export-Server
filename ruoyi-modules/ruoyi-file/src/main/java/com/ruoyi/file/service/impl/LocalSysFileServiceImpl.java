@@ -1,5 +1,6 @@
 package com.ruoyi.file.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.file.domain.SysFilePo;
 import com.ruoyi.file.service.ISysFileService;
 import com.ruoyi.file.service.SysFileService;
@@ -7,10 +8,15 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.file.utils.FileUploadUtils;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 本地文件存储
@@ -53,14 +59,29 @@ public class LocalSysFileServiceImpl implements ISysFileService
     @Override
     public SysFilePo uploadFile(MultipartFile file) throws Exception
     {
+        // 上传文件大小
+        long fileSize = file.getSize() / 1024;
+        // 获取文件MD5值
+        String md5 = "";
+        try (InputStream inputStream = file.getInputStream()) {
+            md5 = DigestUtils.md5DigestAsHex(inputStream);
+        }
+        // 根据文件MD5值查询文件
+        LambdaQueryWrapper<SysFilePo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysFilePo::getMd5, md5);
+        List<SysFilePo> sysFilePos = sysFileService.list(queryWrapper);
+        if (! sysFilePos.isEmpty()) {
+            SysFilePo sysFilePo = sysFilePos.getFirst();
+            sysFilePo.setId(null);
+            sysFileService.save(sysFilePo);
+            return sysFilePo;
+        }
         // 上传文件并返回相对路径
         String name = FileUploadUtils.upload(localFilePath, file);
         // 服务器本地路径
         String localPath = localFilePath + name;
-        // 上传文件大小
-        long fileSize = file.getSize() / 1024;
         // 远程路径
-        String remotePath = domain + localFilePrefix + name;
+        String remotePath = localFilePrefix + name;
         // 保存文件信息
         SysFilePo sysFilePo = new SysFilePo();
         sysFilePo.setLocalPath(localPath);
@@ -68,6 +89,7 @@ public class LocalSysFileServiceImpl implements ISysFileService
         sysFilePo.setFileName(file.getOriginalFilename());
         sysFilePo.setFileSize(String.valueOf(fileSize));
         sysFilePo.setUploadTime(LocalDateTime.now());
+        sysFilePo.setMd5(md5);
         sysFileService.save(sysFilePo);
         // 返回
         return sysFilePo;

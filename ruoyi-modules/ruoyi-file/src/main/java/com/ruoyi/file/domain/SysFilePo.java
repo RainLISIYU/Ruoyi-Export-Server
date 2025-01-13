@@ -52,6 +52,11 @@ public class SysFilePo implements Serializable {
      */
     private LocalDateTime uploadTime;
 
+    /**
+     * md5
+     */
+    private String md5;
+
     @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -152,6 +157,20 @@ public class SysFilePo implements Serializable {
      */
     public void setUploadTime(LocalDateTime uploadTime) {
         this.uploadTime = uploadTime;
+    }
+
+    /**
+     * 获取MD5
+     */
+    public String getMd5() {
+        return md5;
+    }
+
+    /**
+     * 设置MD5
+     */
+    public void setMd5(String md5) {
+        this.md5 = md5;
     }
 
     @Override

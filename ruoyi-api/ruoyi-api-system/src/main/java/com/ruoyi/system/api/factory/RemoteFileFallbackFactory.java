@@ -9,6 +9,9 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.api.RemoteFileService;
 import com.ruoyi.system.api.domain.SysFile;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * 文件服务降级处理
  * 
@@ -32,7 +35,12 @@ public class RemoteFileFallbackFactory implements FallbackFactory<RemoteFileServ
             }
 
             @Override
-            public R<SysFile> listFiles(String fileIds, String source) {
+            public R<List<SysFile>> listFiles(Collection<Long> fileIds, String source) {
+                return R.fail("查询失败：" + throwable.getMessage());
+            }
+
+            @Override
+            public R<List<SysFile>> listByMd5(String md5, String source) {
                 return R.fail("查询失败：" + throwable.getMessage());
             }
         };
