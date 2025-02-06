@@ -104,3 +104,6 @@
    <img src="./2020041121222049.png">
 2. @Configuration解析流程 - ConfigurationClassPostProcessor处理逻辑
    <img src="./20200401210855192.png"/>
+### SpringBoot启动流程图
+1. SpringBoot启动流程图，详细展示初始化过程中各配置类调用顺序
+<img src="./640.jpg">

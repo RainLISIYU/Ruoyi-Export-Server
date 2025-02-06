@@ -49,8 +49,10 @@ public class ActivityTest {
         Deployment deployment = repositoryService.createDeployment()
                 .addClasspathResource("process/leave.bpmn20.xml")
                 .addClasspathResource("process/leave.bpmn20.png")
+                .enableDuplicateFiltering()
                 .name("请假流程")
                 .deploy();
+        repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
         // 输出
         log.info("流程部署ID:{}", deployment.getId());
         log.info("流程部署名称：{}", deployment.getName());
@@ -58,6 +60,9 @@ public class ActivityTest {
 
     }
 
+    /**
+     * 启动流程
+     */
     @Test
     public void activityStartProcess() {
         // 创建ProcessEngine
