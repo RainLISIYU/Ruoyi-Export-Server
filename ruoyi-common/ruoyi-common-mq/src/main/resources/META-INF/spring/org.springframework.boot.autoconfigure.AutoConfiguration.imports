@@ -2,3 +2,4 @@ com.ruoyi.common.mq.configure.DirectRabbitConfig
 com.ruoyi.common.mq.configure.RabbitMqConfig
 com.ruoyi.common.mq.configure.RabbitmqConfirmCallback
 com.ruoyi.common.mq.configure.TopicRabbitConfig
+com.ruoyi.common.mq.configure.DeadRabbitConfig

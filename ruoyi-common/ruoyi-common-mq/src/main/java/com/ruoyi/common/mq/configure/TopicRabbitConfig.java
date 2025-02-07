@@ -7,6 +7,9 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author lsy
  * @description topic模式配置类
@@ -47,7 +50,11 @@ public class TopicRabbitConfig {
      */
     @Bean
     public Queue topicQueueFirst() {
-        return new Queue(TOPIC_FIRST_QUEUE);
+        // 设置参数，死信队列
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-dead-letter-exchange", DeadRabbitConfig.DEAD_EXCHANGE);
+        arguments.put("x-dead-letter-routing-key", DeadRabbitConfig.DEAD_ROUTING);
+        return new Queue(TOPIC_FIRST_QUEUE, true, false, false, arguments);
     }
 
     /**

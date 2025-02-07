@@ -62,7 +62,7 @@ public class SysPostController extends BaseController
      */
     @RequiresPermissions("system:post:query")
     @GetMapping(value = "/{postId}")
-    public AjaxResult getInfo(@PathVariable Long postId)
+    public AjaxResult getInfo(@PathVariable("postId") Long postId)
     {
         return success(postService.selectPostById(postId));
     }

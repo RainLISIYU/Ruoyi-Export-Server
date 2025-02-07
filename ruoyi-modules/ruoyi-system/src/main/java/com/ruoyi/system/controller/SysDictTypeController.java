@@ -59,7 +59,7 @@ public class SysDictTypeController extends BaseController
      */
     @RequiresPermissions("system:dict:query")
     @GetMapping(value = "/{dictId}")
-    public AjaxResult getInfo(@PathVariable Long dictId)
+    public AjaxResult getInfo(@PathVariable("dictId") Long dictId)
     {
         return success(dictTypeService.selectDictTypeById(dictId));
     }

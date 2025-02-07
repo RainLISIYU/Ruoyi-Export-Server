@@ -37,7 +37,7 @@ public class RabbitTestController {
      * @return ok
      */
     @GetMapping("/sendDirectMessage")
-    public String sendDirectMessage(@RequestParam String msg) {
+    public String sendDirectMessage(@RequestParam("msg") String msg) {
 
         Map<String, Object> map = geneMapParam(msg);
         CorrelationData correlationData = new CorrelationData(String.valueOf(map.get("uuid")));
@@ -52,7 +52,7 @@ public class RabbitTestController {
      * @return ok
      */
     @GetMapping("/sendTopicMessageFirst")
-    public String sendTopicMessageFirst(@RequestParam String msg) {
+    public String sendTopicMessageFirst(@RequestParam("msg") String msg) {
         Map<String, Object> map = geneMapParam(msg);
         CorrelationData correlationData = new CorrelationData(String.valueOf(map.get("uuid")));
         rabbitTemplate.convertAndSend(TopicRabbitConfig.TOPIC_EXCHANGE, TopicRabbitConfig.TOPIC_FIRST_KEY, JSON.toJSONString(map), correlationData);
@@ -66,7 +66,7 @@ public class RabbitTestController {
      * @return ok
      */
     @GetMapping("/sendTopicMessageSecond")
-    public String sendTopicMessageSecond(@RequestParam String msg) {
+    public String sendTopicMessageSecond(@RequestParam("msg") String msg) {
         Map<String, Object> map = geneMapParam(msg);
         CorrelationData correlationData = new CorrelationData(String.valueOf(map.get("uuid")));
         rabbitTemplate.convertAndSend(TopicRabbitConfig.TOPIC_EXCHANGE, "test.second", JSON.toJSONString(map), correlationData);
