@@ -2,6 +2,8 @@
 FROM  openjdk:21
 # author
 MAINTAINER ruoyi
+# 暴露端口
+EXPOSE 8080
 
 # 挂载目录
 VOLUME /home/ruoyi
@@ -9,8 +11,6 @@ VOLUME /home/ruoyi
 RUN mkdir -p /home/ruoyi
 # 指定路径
 WORKDIR /home/ruoyi
-# 暴露端口
-EXPOSE 8080
 # 复制jar文件到路径
 COPY ./jar/ruoyi-gateway.jar /home/ruoyi/ruoyi-gateway.jar
 # 启动网关服务

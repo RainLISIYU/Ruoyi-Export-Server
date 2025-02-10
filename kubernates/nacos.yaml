@@ -13,14 +13,16 @@ metadata:
 spec:
   selector:
     app: nacos
-  type: LoadBalancer
+  type: NodePort
   ports:
   - name: http
     port: 8848
     targetPort: 8848
+    nodePort: 30001
   - name: client-rpc
     port: 9848
     targetPort: 9848
+    nodePort: 31001
 
 ---
 
@@ -43,8 +45,8 @@ spec:
     spec:
       containers:
       - name: nacos
-        image: nacos/nacos-server:v2.5.0
-        imagePullPolicy: Always
+        image: nacos/nacos-server:v2.4.3
+        imagePullPolicy: IfNotPresent
         ports:
         - name: http
           containerPort: 8848
@@ -121,7 +123,7 @@ metadata:
   name: nacos-config
   namespace: nacos-namespace
 data:
-  nacos.mode: "cluster"
+  nacos.mode: "standalone"
   mysql.db.name: ry-config
   mysql.host: 120.25.106.163
   mysql.password: lsy19980104

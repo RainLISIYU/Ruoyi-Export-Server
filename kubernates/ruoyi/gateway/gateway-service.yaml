@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: project-test
+  labels:
+    app: gateway
+spec:
+  type: NodePort  # 可以根据需要改为 NodePort 或 LoadBalancer
+  ports:
+    - name: gateway-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 31600
+  selector:
+    app: gateway

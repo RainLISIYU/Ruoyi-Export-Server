@@ -1,6 +1,7 @@
 version : '3.8'
 services:
   ruoyi-gateway:
+    image: ruoyi-gateway:1.3
     container_name: ruoyi-gateway
     build:
       context: ./ruoyi/gateway
