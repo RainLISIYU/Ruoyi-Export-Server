@@ -14,7 +14,7 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: 127.0.0.1:30001
+        server-addr: 127.0.0.1:8848
         # k8s集群内地址
 #        server-addr: nacos.nacos-namespace.svc.cluster.local:8848
         # 命名空间
@@ -24,7 +24,7 @@ spring:
         password: nacos123456.
       config:
         # 配置中心地址
-        server-addr: 127.0.0.1:30001
+        server-addr: 127.0.0.1:8848
 #        server-addr: nacos.nacos-namespace.svc.cluster.local:8848
         # 配置文件格式
         file-extension: yml
@@ -39,3 +39,12 @@ spring:
     sentinel:
       transport:
         dashboard: 127.0.0.1:8718
+# Dubbo配置
+dubbo:
+  scan:
+    base-packages: com.ruoyi.system.service
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: nacos://${nacos.address:127.0.0.1}:8848?username=nacos&password=nacos123456.

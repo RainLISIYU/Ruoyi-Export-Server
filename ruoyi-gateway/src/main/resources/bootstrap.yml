@@ -13,8 +13,9 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-#        server-addr: 127.0.0.1:30001
-        server-addr: nacos.nacos-namespace.svc.cluster.local:8848
+        server-addr: 127.0.0.1:8848
+#        server-addr: 127.0.0.1:31600
+#        server-addr: nacos.nacos-namespace.svc.cluster.local:8848
         # 命名空间
         namespace: d30d8ecb-9dd4-4c56-8a4e-8cc2194158ff
         #用户名，密码
@@ -22,8 +23,9 @@ spring:
         password: nacos123456.
       config:
         # 配置中心地址
-#        server-addr: 127.0.0.1:30001
-        server-addr: nacos.nacos-namespace.svc.cluster.local:8848
+        server-addr: 127.0.0.1:8848
+#        server-addr: 127.0.0.1:31600
+#        server-addr: nacos.nacos-namespace.svc.cluster.local:8848
         # 配置文件格式
         file-extension: yml
         # 共享配置
@@ -33,21 +35,21 @@ spring:
         #用户名，密码
         username: nacos
         password: nacos123456.
-  #    sentinel:
-  #      # 取消控制台懒加载
-  #      eager: true
-  #      transport:
-  #        # 控制台地址
-  #        dashboard: 127.0.0.1:8718
-  #      # nacos配置持久化
-  #      datasource:
-  #        ds:
-  #          nacos:
-  #            server-addr: 127.0.0.1:8848
-  #            namespace: d30d8ecb-9dd4-4c56-8a4e-8cc2194158ff
-  #            dataId: sentinel-ruoyi-gateway
-  #            groupId: DEFAULT_GROUP
-  #            username: nacos
-  #            password: nacos123456.
-  #            data-type: json
-  #            rule-type: gw-flow
+    sentinel:
+      # 取消控制台懒加载
+      eager: true
+      transport:
+        # 控制台地址
+        dashboard: 127.0.0.1:8718
+      # nacos配置持久化
+      datasource:
+        ds:
+          nacos:
+            server-addr: 127.0.0.1:8848
+            namespace: d30d8ecb-9dd4-4c56-8a4e-8cc2194158ff
+            dataId: sentinel-ruoyi-gateway
+            groupId: DEFAULT_GROUP
+            username: nacos
+            password: nacos123456.
+            data-type: json
+            rule-type: gw-flow

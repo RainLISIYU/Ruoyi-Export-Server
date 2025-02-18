@@ -23,6 +23,18 @@
             <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
+        <!--   Dubbo     -->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <version>${dubbo.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-zookeeper-curator5-spring-boot-starter</artifactId>
+            <version>${dubbo.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>
