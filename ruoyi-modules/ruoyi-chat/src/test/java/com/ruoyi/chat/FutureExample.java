@@ -3,13 +3,23 @@ package com.ruoyi.chat;
 import com.lsy.baselib.crypto.algorithm.DESede;
 import com.lsy.baselib.crypto.exception.DESedeException;
 import org.junit.jupiter.api.Test;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author lsy
@@ -63,7 +73,7 @@ public class FutureExample {
     public void thenApply() throws ExecutionException, InterruptedException {
         CompletableFuture<Void> completableFuture = CompletableFuture.supplyAsync(() -> {
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(4000);
                     } catch (Exception e) {
                         System.err.println(e.getMessage());
                     }
@@ -144,6 +154,256 @@ public class FutureExample {
         byte[] deData = decoder.decode(sessionData);
         byte[] decrypt = DESede.decrypt(deData, secCode, iv);
         System.out.println(new String(decrypt, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void syncCondition() throws InterruptedException {
+        ReentrantLock lock = new ReentrantLock();
+        Condition condition = lock.newCondition();
+        // Thread1 Run
+        threadPoolExecutor.execute(() -> {
+            System.out.println(Thread.currentThread().getName() + "开始执行");
+            lock.lock();
+            try {
+                System.out.println(Thread.currentThread().getName() + "等待");
+                condition.await();
+                System.out.println(Thread.currentThread().getName() + "继续执行");
+            }catch (InterruptedException e) {
+                System.err.println(e.getMessage());
+            } finally {
+                lock.unlock();
+            }
+            System.out.println(Thread.currentThread().getName() + "结束执行");
+        });
+        // Thread2 Run
+        threadPoolExecutor.execute(() -> {
+            try {
+                // 保证Thread1先执行
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                System.err.println(e.getMessage());
+            }
+            System.out.println(Thread.currentThread().getName() + "开始执行");
+            lock.lock();
+            try {
+                System.out.println(Thread.currentThread().getName() + "唤醒");
+                condition.signal();
+                System.out.println(Thread.currentThread().getName() + "唤醒后继续");
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            } finally {
+                lock.unlock();
+            }
+            System.out.println(Thread.currentThread().getName() + "结束执行");
+        });
+        Thread.sleep(10000);
+    }
+
+    @Test
+    public void proxyTest() {
+        ProxyImage proxyImage = new ProxyImage(new RealImage("test.jpg"));
+        Image image = (Image) proxyImage.getInstance();
+        image.display();
+    }
+
+    @Test
+    public void enhancerTest() {
+        ImageEnhancer imageEnhancer = new ImageEnhancer(new RealImage("file1.jpg"));
+        Image image = (Image) imageEnhancer.getInstance();
+        image.display();
+    }
+
+    /**
+     * 命令模式
+     */
+    @Test
+    public void commandPattern() {
+        Broker broker = new Broker();
+        Stock stock = new Stock("产品1", 10);
+        broker.takeOrder(new BuyStock(stock));
+        broker.takeOrder(new SellStock(stock));
+        broker.placeOrders();
+    }
+
+    @Test
+    public void IteratorPattern() {
+        NameRepository nameRepository = new NameRepository(new String[]{"Robert", "John", "Julie", "Lora"});
+        Iterator<String> iterator = nameRepository.getIterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+        System.out.println(gcd(180, 32));
+    }
+
+    // 求最大公约数 弗洛伊德算法
+    int gcd(int a, int b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
+
+}
+
+interface Iterator<T> {
+    boolean hasNext();
+    T next();
+}
+
+interface Container<T> {
+    Iterator<T> getIterator();
+}
+
+class NameRepository implements Container<String> {
+
+    private String[] names;
+
+    public NameRepository(String[] names) {
+        this.names = names;
+    }
+
+    @Override
+    public Iterator<String> getIterator() {
+        return new Iterator<>() {
+
+            int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < names.length;
+            }
+
+            @Override
+            public String next() {
+                return names[index++];
+            }
+        };
+    }
+
+}
+
+class Stock {
+    private String name;
+    private int quantity;
+
+    public Stock(String name, int quantity) {
+        this.name = name;
+        this.quantity = quantity;
+    }
+
+    public void buy() {
+        System.out.println("Stock [ Name: " + name + ", Quantity: " + quantity + " ] bought");
+    }
+
+    public void sell() {
+        System.out.println("Stock [ Name: " + name + ", Quantity: " + quantity + " ] sold");
+    }
+}
+
+interface Order {
+    void execute();
+}
+
+class BuyStock implements Order {
+    private Stock stock;
+    public BuyStock(Stock stock) {
+        this.stock = stock;
+    }
+    @Override
+    public void execute() {
+        stock.buy();
+    }
+}
+
+class SellStock implements Order {
+    private Stock stock;
+    public SellStock(Stock stock) {
+        this.stock = stock;
+    }
+    @Override
+    public void execute() {
+        stock.sell();
+    }
+}
+
+class Broker {
+    private List<Order> orderList = new ArrayList<>();
+    public void takeOrder(Order order) {
+        orderList.add(order);
+    }
+
+    public void placeOrders() {
+        for (Order order : orderList) {
+            order.execute();
+        }
+        orderList.clear();
+    }
+}
+
+interface Image {
+    void display();
+}
+
+class RealImage implements Image {
+
+    private final String fileName;
+
+    public RealImage(String fileName) {
+        this.fileName = fileName;
+    }
+
+    @Override
+    public void display() {
+        System.out.println("Displaying " + fileName);
+    }
+
+    private void loadFromDisk(String fileName) {
+        System.out.println("Loading " + fileName);
+    }
+
+}
+
+class ProxyImage implements InvocationHandler {
+
+    private Object image;
+
+    public ProxyImage (Object target) {
+        this.image = target;
+    }
+
+    public Object getInstance() {
+        return Proxy.newProxyInstance(image.getClass().getClassLoader(), image.getClass().getInterfaces(), this);
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        return method.invoke(image, args);
+    }
+}
+
+class EnhancerImage implements Image {
+
+    @Override
+    public void display() {
+        System.out.println("Enhancer Display .");
+    }
+}
+
+class ImageEnhancer implements MethodInterceptor {
+
+    private Object target;
+
+    public ImageEnhancer(Object target) {
+        this.target = target;
+    }
+
+    public Object getInstance() {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(target.getClass());
+        enhancer.setCallback(this);
+        return enhancer.create(new Class[] {String.class}, new Object[] {"file2.jpg"});
+    }
+
+    @Override
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+        return proxy.invokeSuper(obj, args);
     }
 
 }
