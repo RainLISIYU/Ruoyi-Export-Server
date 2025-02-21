@@ -47,4 +47,4 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://${nacos.address:127.0.0.1}:8848?username=nacos&password=nacos123456.
+    address: nacos://127.0.0.1:8848?username=nacos&password=nacos123456.
