@@ -29,13 +29,14 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
-        <!--   Dubbo   -->
+        <!-- Dubbo -->
         <dependency>
             <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-bom</artifactId>
-            <version>${dubbo.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-nacos-spring-boot-starter</artifactId>
         </dependency>
 
         <!-- SpringCloud Alibaba Sentinel -->
@@ -74,11 +75,11 @@
 <!--        </dependency>-->
 
         <!-- RuoYi Activity -->
-        <dependency>
-            <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-common-activity</artifactId>
-            <version>3.6.3</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.ruoyi</groupId>-->
+<!--            <artifactId>ruoyi-common-activity</artifactId>-->
+<!--            <version>3.6.3</version>-->
+<!--        </dependency>-->
 
         <!-- RuoYi Common DataSource -->
         <dependency>
@@ -131,17 +132,9 @@
             <version>${lombok.version}</version>
         </dependency>
 
-        <!-- 百度AI -->
         <dependency>
-            <groupId>com.baidu.aip</groupId>
-            <artifactId>java-sdk</artifactId>
-            <version>${baidu-ai.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
         </dependency>
 
     </dependencies>

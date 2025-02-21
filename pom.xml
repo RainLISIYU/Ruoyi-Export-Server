@@ -20,7 +20,7 @@
         <spring-core.version>6.0.21</spring-core.version>
         <spring-web.version>6.1.12</spring-web.version>
 <!--        <spring-boot.version>3.0.13</spring-boot.version>-->
-        <spring-boot.version>3.2.4</spring-boot.version>
+        <spring-boot.version>3.3.4</spring-boot.version>
 <!--        <spring-cloud.version>2022.0.0</spring-cloud.version>-->
         <spring-cloud.version>2023.0.1</spring-cloud.version>
 <!--        <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>-->
@@ -55,6 +55,10 @@
         <maven-plugin.version>3.4.0</maven-plugin.version>
         <baidu-ai.version>4.16.19</baidu-ai.version>
         <dubbo.version>3.3.0</dubbo.version>
+        <!-- Spring AI -->
+        <spring-ai.version>1.0.0-M5</spring-ai.version>
+        <!-- Spring AI Alibaba -->
+        <spring-ai-alibaba.version>1.0.0-M5.1</spring-ai-alibaba.version>
 <!--        <spring-webmvc.version>6.2.0</spring-webmvc.version>-->
     </properties>
 
@@ -276,25 +280,39 @@
                 <version>${snakeyaml.version}</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework</groupId>-->
-<!--                <artifactId>spring-core</artifactId>-->
-<!--                <version>${spring-core.version}</version>-->
-<!--            </dependency>-->
-
-            <!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework</groupId>-->
-<!--                <artifactId>spring-web</artifactId>-->
-<!--                <version>${spring-core.version}</version>-->
-<!--            </dependency>-->
-
             <!-- Mysql Connector -->
             <dependency>
                 <groupId>com.mysql</groupId>
                 <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql-connector.version}</version>
+            </dependency>
+
+            <!--   Dubbo   -->
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-bom</artifactId>
+                <version>${dubbo.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-core -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-core</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter</artifactId>
+                <version>${spring-ai-alibaba.version}</version>
             </dependency>
 
         </dependencies>
@@ -357,6 +375,14 @@
             <releases>
                 <enabled>true</enabled>
             </releases>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
