@@ -6,3 +6,5 @@ services:
     build:
       context: ./ruoyi/gateway
       dockerfile: dockerfile
+    ports:
+      - "8080:8080"
