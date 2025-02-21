@@ -29,13 +29,14 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
-        <!--   Dubbo   -->
+        <!-- Dubbo -->
         <dependency>
             <groupId>org.apache.dubbo</groupId>
-            <artifactId>dubbo-bom</artifactId>
-            <version>${dubbo.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-nacos-spring-boot-starter</artifactId>
         </dependency>
         
     	<!-- SpringCloud Alibaba Sentinel -->
