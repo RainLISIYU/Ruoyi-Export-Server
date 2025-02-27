@@ -136,6 +136,13 @@
             <version>${mybatis-plus.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httputils.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

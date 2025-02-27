@@ -1,18 +1,24 @@
-package com.ruoyi.business.controller.ai;
+package com.ruoyi.business.ai;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.common.utils.UuidUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.log.annotation.Log;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.ai.autoconfigure.vectorstore.pgvector.PgVectorStoreAutoConfiguration;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +41,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ChatController {
 
     private ChatClient chatClient;
+
+    @Resource
+    private VectorStore myVectorStore;
 
     public ChatController(ChatModel chatModel) {
         this.chatClient = ChatClient.builder(chatModel)
@@ -90,7 +99,9 @@ public class ChatController {
         String finalChatId = chatId;
         Flux<String> chatResponse = chatClient
                 .prompt()
+//                .functions("getWeatherFunction")
                 .user(input)
+                .advisors(new QuestionAnswerAdvisor(myVectorStore))
                 .advisors(advisor ->
                         advisor
                                 .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, finalChatId)
@@ -99,7 +110,7 @@ public class ChatController {
                 .content();
         AtomicReference<String> content = new AtomicReference<>("");
         return chatResponse.map(data -> {
-            content.set(content.get() + data.replace("<think>", "").replace("</think>", ""));
+            content.set(content.get() + data);
             Map<String, String> map = new HashMap<>();
             map.put("chatId", finalChatId);
             map.put("data", content.get());
@@ -140,6 +151,31 @@ public class ChatController {
                 .entity(ActorFilms.class);
         assert actorFilms != null;
         return actorFilms.toString();
+    }
+
+    /**
+     * 加入rag后输出
+     *
+     * @param input 输入
+     * @return 输出
+     */
+    @GetMapping(value = "/rag/chat")
+    public String ragChat(@RequestParam("input") String input) {
+        // 发起聊天
+        return chatClient.prompt()
+                .user(input)
+                .advisors(new QuestionAnswerAdvisor(myVectorStore))
+                .call()
+                .content();
+    }
+
+    @GetMapping("/similar")
+    public List<Document> similar(@RequestParam("input") String input) {
+        return myVectorStore.similaritySearch(SearchRequest.builder()
+                .query(input)
+                .topK(5)
+                .similarityThreshold(0.7)
+                .build());
     }
 
 }

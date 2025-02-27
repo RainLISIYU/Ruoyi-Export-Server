@@ -1,4 +1,4 @@
-package com.ruoyi.business.controller.ai;
+package com.ruoyi.business.ai;
 
 import org.springframework.ai.image.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,5 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ImageModelController {
 
     // TODO 图像模型调用功能
+    private ImageModel imageModel;
 
 }
