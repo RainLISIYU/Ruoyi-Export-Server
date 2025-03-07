@@ -9,8 +9,13 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.core.annotation.Excel;
 import com.ruoyi.common.core.web.domain.BaseEntity;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 
 import java.io.Serial;
+import java.lang.reflect.Method;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 测试对象 my_test
@@ -22,6 +27,8 @@ import java.io.Serial;
 @Data
 public class MyTest extends BaseEntity
 {
+
+    ThreadLocal<MyTest> threadLocal = ThreadLocal.withInitial(MyTest::new);
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -49,5 +56,30 @@ public class MyTest extends BaseEntity
             .append("name", getName())
             .append("address", getAddress())
             .toString();
+    }
+
+    public static void main(String[] args) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(CgClass.class);
+        enhancer.setClassLoader(CgClass.class.getClassLoader());
+        enhancer.setCallback(new DebugMethodInterceptor());
+        CgClass cg = (CgClass) enhancer.create();
+        cg.send();
+    }
+
+
+}
+
+class CgClass {
+    public void send() {
+        System.out.println("1111");
+    }
+}
+
+class DebugMethodInterceptor implements MethodInterceptor {
+
+    @Override
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+        return proxy.invoke(obj, args);
     }
 }

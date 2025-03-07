@@ -143,6 +143,13 @@
             <version>${httputils.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.redisson/redisson-spring-boot-starter -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redission.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

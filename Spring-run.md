@@ -38,13 +38,13 @@
      * postProcessBeanFactory - 空方法
      * invokeBeanFactoryPostProcessors(beanFactory)：
        1. 获取BeanFactoryPostProcessors，区分BeanDefinitionRegistryPostProcessor（添加于registryProcessors中）和BeanFactoryPostProcessor（添加到regularPostProcessors中）。
-       2. 获取ConfigurationClassPostProcessor，添加到registryProcessors中，并作为参数执行invokeBeanDefinitionRegistryPostProcessors方法，调用其postProcessBeanDefinitionRegistry方法。
+       2. 获取ConfigurationClassPostProcessor，添加到registryProcessors中，并作为参数执行invokeBeanDefinitionRegistryPostProcessors方法，调用其postProcessBeanDefinitionRegistry -> postProcessBeanDefinitions[解析参考](https://www.cnblogs.com/dw3306/p/17942636)方法。
           * 获取ConfigurationClassParser并执行parse方法。
             * 进入ComponentScanAnnotationParser.parse方法，初始化ClassPathBeanDefinitionScanner，设置所需参数。
             * 执行ClassPathBeanDefinitionScanner.doScan()，扫描ComponentScan路径下所有class文件，判断哪些类需要注册为BeanDefinition，例如：注解@Componenet，@Configuration，是否跳过ConditionOn等。
             * 获取beanDefinition，处理为BeanDefinitionHolder，注册到beanFactory的beanDefinitionMap中，key为beanName，value为BeanDefinition。
-            * 后续处理扫描到的Set<BeanDefinitonHolder>，源码注释(递归处理扫描到的类)-Check the set of scanned definitions for any further config classes and parse recursively if needed
-            * processImport处理@Import注解类，3类：ImportBeanDefinitionRegistrar、ImportSelector、其他，记录相关配置类。
+            * 后续循环处理扫描到的Set<BeanDefinitonHolder>，源码注释(递归处理扫描到的类)-Check the set of scanned definitions for any further config classes and parse recursively if needed
+            * processImport处理@Import注解类，3类：ImportBeanDefinitionRegistrar（AutoConfigurationPackages.Registrar）、ImportSelector（AutoConfigurationImportSelector类）、其他，记录相关配置类。
             * 检索所有@Bean方法，生成beanMethod，添加到configClass的beanMethod中。
             * 执行this.deferredImportSelectorHandler.process()处理ImportSelector（自动配置的AutoConfigurationImportSelector）
               * 一系列处理后调用AutoConfigurationImportSelector.process() -> ConfigurationClassParser.processGroupImports() -> grouping.getImports() -> AutoConfigurationImportSelector.process() -> getAutoConfigurationEntry()获取所有自动配置类。
@@ -81,7 +81,7 @@
               2. 执行resolveBeforeInstantiation（bean实例化前让BeanPostProcessors能够先返回bean的代理，不为空直接返回bean）。
               3. doCreateBean()
                  * 生成BeanWrapper，先从factoryBeanInstanceCache中获取。没有则调用createBeanInstance()：先获取class对象，从beanDefinition中获取InstanceSupplier，存在从里面获取beanWrapper，否则根据beanDefinition中的resolvedConstructorOrFactoryMethod获取，没有再通过其他方式获取构造方法。都没有最终调用instantiateBean方法，通过beanDefinition获取class对象，使用class获取构造方法，通过构造方法实例化bean，使用实例化的bean初始化BeanWrapper，设置BeanWrapper参数返回。
-                 * 后续处理，applyMergedBeanDefinitionPostProcessor方法处理属性（eg:CommonAnnotationBeanPostProcessor.postProcessorMergedBeanDefinition获取@PostConstruct、@PreDestroy、@Resource等注解并记录;AutowiredAnnotationBeanPostProcessor处理@Autowired注解）。[参考](https://blog.csdn.net/qq_35512802/article/details/132165692)
+                 * 后续处理，applyMergedBeanDefinitionPostProcessor方法处理属性（eg:CommonAnnotationBeanPostProcessor.postProcessorMergedBeanDefinition获取@PostConstruct、@PreDestroy、@Resource等注解并记录[参考](https://cloud.tencent.com/developer/article/2488672);AutowiredAnnotationBeanPostProcessor处理@Autowired注解[参考](https://cloud.tencent.com/developer/article/2488670)）。
                  * populateBean填充上面获取属性值，调用PostProcessor.postProcessProperties方法（eg：CommonAnnotationBeanPostProcessor）。
                  * initializeBean执行beanPostProcessor前置处理，initializingBean接口初始化方法，后置处理。
      * 完成刷新过程，清空资源缓存，初始化生命周期处理器，调用生命处理器的onFresh，发布最后事件
@@ -107,3 +107,8 @@
 ### SpringBoot启动流程图
 1. SpringBoot启动流程图，详细展示初始化过程中各配置类调用顺序
 <img src="./640.jpg">
+### SpringBoot AOP源码
+1. 配置类引入。@EnableAspectjAutoProxy中Import导入AspectJAutoProxyRegistrar。
+2. 
+### SpringBoot refresh最后一步preInstantiateSingletons流程图
+<img src="./9507f81348e1cf577c545b84291d0448.png" title="preInstantiateSingletons流程图" alt="preInstantiateSingletons流程图" />

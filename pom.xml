@@ -61,6 +61,7 @@
         <spring-ai-alibaba.version>1.0.0-M5.1</spring-ai-alibaba.version>
 <!--        <spring-webmvc.version>6.2.0</spring-webmvc.version>-->
         <httputils.version>4.5.13</httputils.version>
+        <redission.version>3.45.0</redission.version>
     </properties>
 
     <!-- 依赖声明 -->
