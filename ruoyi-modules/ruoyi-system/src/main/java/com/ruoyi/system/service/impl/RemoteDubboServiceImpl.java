@@ -35,7 +35,6 @@ public class RemoteDubboServiceImpl implements RemoteDubboService {
         String result = "Empty";
         if (! Objects.isNull(admin)) {
             result = admin.getUserName();
-            throw new RuntimeException("模拟异常");
         }
         return result;
     }

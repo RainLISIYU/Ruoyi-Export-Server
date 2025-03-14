@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,6 +41,19 @@ public class RedisCodeServiceImpl implements RedisCodeService {
         // 追加
         Integer ss = strOperations.append("str-test", "ss");
         log.info("append:{}", ss);
+        // lua脚本
+        Object execute = redisTemplate.execute(
+                RedisScript.of("if (redis.call('exists', KEYS[1]) == 1) then" +
+                        " redis.call('expire', KEYS[1], ARGV[1]); " +
+                        " end;" +
+                        " return redis.call('ttl', KEYS[1]);"),
+                List.of("str-test"),
+                15);
+        log.info("lua脚本执行结果：{}", execute);
+        // 过期时间查询
+        Long expire = redisTemplate.getExpire("str-test");
+        Long expire1 = redisTemplate.getExpire("str-test1");
+        log.info("str-test过期时间：{}, str-test1过期时间：{}", expire, expire1);
     }
 
     @Override

@@ -68,6 +68,7 @@ public class DubboController {
         params.put("count", 1);
         System.out.println(remoteBaiduAipService.getSearch(headers, params));
         System.out.println("非锁库存为：" + (countAsync == 0 ? 0 : --countAsync));
+        String result = "Empty";
         try {
             if (admin.tryLock(10, TimeUnit.SECONDS)) {
                 String info = remoteDubboService.getInfo();
@@ -78,13 +79,13 @@ public class DubboController {
                 }
                 Thread.sleep(1000);
                 System.out.println("Dubbo服务admin解锁");
-                return info;
+                result = info;
             }
         } finally {
             admin.unlock();
         }
         redisCodeService.redisStrOperation();
-        return "Empty";
+        return result;
     }
 
     /**
@@ -105,7 +106,6 @@ public class DubboController {
                 String result = "Empty";
                 if (! Objects.isNull(data)) {
                     result = data.getSysUser().getUserName();
-                    throw new RuntimeException("异常抛出");
                 }
                 System.out.println("feign服务释放");
                 return result;
