@@ -1,7 +1,9 @@
 package com.ruoyi.business.controller;
 
+import com.ruoyi.business.service.RedisCodeService;
 import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.system.api.RemoteBaiduAipService;
 import com.ruoyi.system.api.RemoteDubboService;
 import com.ruoyi.system.api.RemoteUserService;
 import com.ruoyi.system.api.model.LoginUser;
@@ -10,11 +12,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author lsy
@@ -26,11 +33,17 @@ import java.util.Objects;
 @Slf4j
 public class DubboController {
 
-    @DubboReference(loadbalance = "roundrobin")
+    @DubboReference(loadbalance = "roundrobin", mock = "com.ruoyi.system.api.factory.RemoteDubboServiceMock")
     private RemoteDubboService remoteDubboService;
 
     @Resource
     private RemoteUserService remoteUserService;
+
+    @Resource
+    private RemoteBaiduAipService remoteBaiduAipService;
+
+    @Autowired
+    private RedisCodeService redisCodeService;
 
     @Resource
     private Redisson redisson;
@@ -47,17 +60,31 @@ public class DubboController {
     @GetMapping("/getInfo")
     public String getInfo() throws InterruptedException {
         RLock admin = redisson.getLock("admin");
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("content-type", "application/json");
+        headers.put("connect-timeout", 1000);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "test");
+        params.put("count", 1);
+        System.out.println(remoteBaiduAipService.getSearch(headers, params));
         System.out.println("非锁库存为：" + (countAsync == 0 ? 0 : --countAsync));
-        admin.lock();
-        String info = remoteDubboService.getInfo();
-        if (count == 0) {
-            System.out.println("库存为0");
-        } else {
-            System.out.println("购买成功，库存为" + --count);
+        try {
+            if (admin.tryLock(10, TimeUnit.SECONDS)) {
+                String info = remoteDubboService.getInfo();
+                if (count == 0) {
+                    System.out.println("库存为0");
+                } else {
+                    System.out.println("购买成功，库存为" + --count);
+                }
+                Thread.sleep(1000);
+                System.out.println("Dubbo服务admin解锁");
+                return info;
+            }
+        } finally {
+            admin.unlock();
         }
-        Thread.sleep(1000);
-        admin.unlock();
-        return info;
+        redisCodeService.redisStrOperation();
+        return "Empty";
     }
 
     /**
@@ -67,12 +94,28 @@ public class DubboController {
      */
     @GetMapping("/getUser")
     public String getUser() {
-        R<LoginUser> userInfo = remoteUserService.getUserInfo("admin", SecurityConstants.INNER);
-        LoginUser data = userInfo.getData();
-        log.info(String.valueOf(data));
-        if (! Objects.isNull(data)) {
-            return data.getSysUser().getUserName();
+        RLock admin = redisson.getLock("admin");
+        System.out.println(Thread.currentThread().getName());
+        try {
+            if (admin.tryLock(10, TimeUnit.SECONDS)) {
+                System.out.println("feign服务开始");
+                R<LoginUser> userInfo = remoteUserService.getUserInfo("admin", SecurityConstants.INNER);
+                LoginUser data = userInfo.getData();
+                log.info(String.valueOf(data));
+                String result = "Empty";
+                if (! Objects.isNull(data)) {
+                    result = data.getSysUser().getUserName();
+                    throw new RuntimeException("异常抛出");
+                }
+                System.out.println("feign服务释放");
+                return result;
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } finally {
+            admin.unlock();
         }
+
         return "Empty";
     }
 

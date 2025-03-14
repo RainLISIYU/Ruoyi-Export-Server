@@ -1,11 +1,13 @@
 package com.ruoyi.system.service.impl;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.ruoyi.system.api.RemoteDubboService;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.service.ISysUserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.dubbo.rpc.RpcException;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
 
@@ -27,14 +29,18 @@ public class RemoteDubboServiceImpl implements RemoteDubboService {
     private Redisson redisson;
 
     @Override
+    @SentinelResource(value = "getInfo", fallback = "fallbackGetInfo")
     public String getInfo() {
-//        RLock adminLock = redisson.getLock("admin");
         SysUser admin = sysUserService.selectUserByUserName("admin");
+        String result = "Empty";
         if (! Objects.isNull(admin)) {
-//            adminLock.lock();
-            return admin.getUserName();
+            result = admin.getUserName();
+            throw new RuntimeException("模拟异常");
         }
-//        adminLock.unlock();
-        return "Empty";
+        return result;
+    }
+
+    private String fallbackGetInfo() {
+        return "sentinel调用异常";
     }
 }

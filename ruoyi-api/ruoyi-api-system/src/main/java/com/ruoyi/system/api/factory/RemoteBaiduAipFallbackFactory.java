@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * @author lsy
  * @description 百度ai请求回调工厂
@@ -19,7 +21,18 @@ public class RemoteBaiduAipFallbackFactory implements FallbackFactory<RemoteBaid
     @Override
     public RemoteBaiduAipService create(Throwable cause) {
         logger.error("百度ai调用失败:{}", cause.getMessage());
-        return (name, source) -> "";
+        return new RemoteBaiduAipService() {
+            @Override
+            public String getToken(Map<String, String> heads, Long expireInSeconds) {
+                return "11";
+            }
+
+            @Override
+            public String getSearch(Map<String, Object> headers, Map<String, Object> params) {
+                return "请求失败";
+            }
+
+        };
     }
 
 }
