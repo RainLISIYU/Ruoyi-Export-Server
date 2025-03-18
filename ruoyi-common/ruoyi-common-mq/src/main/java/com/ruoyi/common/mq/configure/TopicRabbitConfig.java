@@ -25,12 +25,15 @@ public class TopicRabbitConfig {
 
     public static final String TOPIC_THIRD_QUEUE = "TestTopicQueueThird";
 
+    public static final String TOPIC_TTL_QUEUE = "TestTopicQueueTtl";
+
     public static final String TOPIC_FIRST_KEY = "test.first";
 
     public static final String TOPIC_SECOND_KEY = "test.#";
 
     public static final String TOPIC_THIRD_KEY = "iot_send";
 
+    public static final String TOPIC_TTL_KEY = "ttl.key";
 
 
     /**
@@ -55,6 +58,20 @@ public class TopicRabbitConfig {
         arguments.put("x-dead-letter-exchange", DeadRabbitConfig.DEAD_EXCHANGE);
         arguments.put("x-dead-letter-routing-key", DeadRabbitConfig.DEAD_ROUTING);
         return new Queue(TOPIC_FIRST_QUEUE, true, false, false, arguments);
+    }
+
+    /**
+     * 设置ttl队列
+     *
+     * @return 队列
+     */
+    @Bean
+    public Queue topicQueueTtl() {
+        // 设置参数，死信队列
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-dead-letter-exchange", DeadRabbitConfig.DEAD_EXCHANGE);
+        arguments.put("x-dead-letter-routing-key", DeadRabbitConfig.DEAD_ROUTING);
+        return new Queue(TOPIC_TTL_QUEUE, true, false, false, arguments);
     }
 
     /**
@@ -108,6 +125,17 @@ public class TopicRabbitConfig {
     public Binding bindingExchangeThird() {
         return BindingBuilder.bind(topicQueueThird())
                 .to(topicExchange()).with(TOPIC_THIRD_KEY);
+    }
+
+    /**
+     * ttl队列绑定
+     *
+     * @return 绑定
+     */
+    @Bean
+    public Binding bindingExchangeTtl() {
+        return BindingBuilder.bind(topicQueueTtl())
+                .to(topicExchange()).with(TOPIC_TTL_KEY);
     }
 
 

@@ -16,11 +16,11 @@ import java.io.IOException;
  * @date 2025/2/6
  */
 @Component
-@RabbitListener(queues = DeadRabbitConfig.DEAD_QUEUE)
 public class DeadReceiveController {
 
-    @RabbitHandler
-    public void process(String msg, Message message, Channel channel) throws IOException {
+    @RabbitListener(queues = DeadRabbitConfig.DEAD_QUEUE)
+    public void process(Message message, Channel channel) throws IOException {
+        String msg = new String(message.getBody());
         System.out.println("死信队列接收消息：" + msg);
         MessageProperties messageProperties = message.getMessageProperties();
         channel.basicAck(messageProperties.getDeliveryTag(), false);

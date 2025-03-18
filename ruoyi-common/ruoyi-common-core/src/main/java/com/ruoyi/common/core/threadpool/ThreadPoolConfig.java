@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author lsy
@@ -23,9 +24,11 @@ public class ThreadPoolConfig {
 
     private static final int KEEP_ALIVE_TIME = 1000;
 
+    private final AtomicInteger count = new AtomicInteger(1);
+
     @Bean
     public ThreadPoolExecutor threadPoolExecutor() {
-        ThreadFactory threadFactory = Thread.ofVirtual().name("Virtual Thread ==> ").factory();
+        ThreadFactory threadFactory = Thread.ofVirtual().name("Virtual Thread - " + count.getAndIncrement() + " ==> ").factory();
         try(ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
                 CORE_POOL_SIZE,
                 MAXIMUM_POOL_SIZE,

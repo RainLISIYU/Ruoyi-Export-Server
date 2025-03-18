@@ -8,6 +8,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 /**
  * @author lsy
@@ -15,13 +17,23 @@ import java.io.IOException;
  * @date 2024/7/3
  */
 @Component
-@RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
 public class TopicReceiverFirst {
 
-    @RabbitHandler
-    public void process(String msg, Message message, Channel channel) throws IOException {
-        System.out.println("TopicReceiverFirst消费者拒绝消息  : " + msg);
-        channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+    @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
+    public void process(String msg, Message message, Channel channel) throws Exception {
+        System.out.println("TopicReceiverFirst消费者1接收消息  : " + msg);
+//        if (LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli() % 2 == 0) {
+//            System.out.println("消费者1拒绝消息：" + msg);
+//            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+//            return;
+//        }
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+    }
+
+    @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
+    public void process1(String msg, Message message, Channel channel) throws Exception {
+        System.out.println("TopicReceiverFirst消费者2接收消息：" + msg);
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
     }
 
 }

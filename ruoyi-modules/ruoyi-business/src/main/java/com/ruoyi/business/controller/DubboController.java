@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author lsy
@@ -33,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class DubboController {
 
-    @DubboReference(loadbalance = "roundrobin", mock = "com.ruoyi.system.api.factory.RemoteDubboServiceMock")
+    @DubboReference(loadbalance = "roundrobin", mock = "com.ruoyi.system.api.factory.RemoteDubboServiceMock", retries = 3)
     private RemoteDubboService remoteDubboService;
 
     @Resource
@@ -44,6 +45,17 @@ public class DubboController {
 
     @Autowired
     private RedisCodeService redisCodeService;
+
+    private final AtomicInteger countA = new AtomicInteger(1);
+    ThreadFactory threadFactory = Thread.ofVirtual().name("Virtual Thread - " + countA.getAndIncrement() + " ==> ").factory();
+    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+            10,
+            10,
+            500,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(),
+            threadFactory,
+            new ThreadPoolExecutor.CallerRunsPolicy());
 
     @Resource
     private Redisson redisson;
@@ -84,7 +96,16 @@ public class DubboController {
         } finally {
             admin.unlock();
         }
-        redisCodeService.redisStrOperation();
+        CompletableFuture<Void> cf1 = CompletableFuture.runAsync(() -> redisCodeService.redisSetOperation(), threadPoolExecutor);
+        CompletableFuture<Void> cf2 = CompletableFuture.runAsync(() -> redisCodeService.redisZsetOperation(), threadPoolExecutor);
+        CompletableFuture.allOf(cf1, cf2)
+                .thenRunAsync(() -> redisCodeService.redisStrOperation(), threadPoolExecutor)
+                .thenRunAsync(() -> redisCodeService.redisHashOperation(), threadPoolExecutor)
+                .thenRunAsync(() -> redisCodeService.redisListOperation(), threadPoolExecutor)
+                .exceptionally(e -> {
+                    log.error(e.getMessage());
+                    return null;
+                });
         return result;
     }
 

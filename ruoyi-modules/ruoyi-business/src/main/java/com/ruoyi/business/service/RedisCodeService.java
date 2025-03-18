@@ -5,14 +5,29 @@ package com.ruoyi.business.service;/*
 
 public interface RedisCodeService {
 
+    /**
+     * redis字符串操作
+     */
     void redisStrOperation();
 
+    /**
+     * redis Hash操作
+     */
     void redisHashOperation();
 
+    /**
+     * redis列表操作
+     */
     void redisListOperation();
 
+    /**
+     * redis集合操作
+     */
     void redisSetOperation();
 
+    /**
+     * redis有序集合操作
+     */
     void redisZsetOperation();
 
 }
