@@ -68,17 +68,15 @@
         </dependency>
 
         <!--  RuoYi Common elasticSearch  -->
-<!--        <dependency>-->
-<!--            <groupId>com.ruoyi</groupId>-->
-<!--            <artifactId>ruoyi-common-es</artifactId>-->
-<!--            <version>3.6.3</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-es</artifactId>
+        </dependency>
 
         <!-- RuoYi Activity -->
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-activity</artifactId>
-            <version>3.6.3</version>
         </dependency>
 
         <!-- RuoYi Common DataSource -->
@@ -97,14 +95,12 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-mq</artifactId>
-            <version>3.6.3</version>
         </dependency>
 
         <!-- RuoYi Common redis -->
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-redis</artifactId>
-            <version>3.6.3</version>
         </dependency>
 
         <!-- RuoYi Common Log -->

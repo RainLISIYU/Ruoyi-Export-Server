@@ -4,6 +4,7 @@
 3. ConcurrentHashMap：[参考源码解析](https://javaguide.cn/java/collection/concurrent-hash-map-source-code.html#_2-concurrenthashmap-1-8)
 4. ArrayBlockingQueue：含有阻塞入队和出队功能，put和take，共用同一个ReentrantLock，通过两个Condition(NotFull和NotEmpty)，入队时判断队列是否已满，若满则NotFull.await，否则元素入队并NotEmpty.signal。出队相反。
 <img src="./ArrayBlockingQueue-notEmpty-notFull.png">
+5. CopyOnWriteArrayList：add方法，加锁并通过复制数组进行添加元素；get方法直接返回，可能读到旧值；删除方法，加锁通过复制数组进行删除元素。
 ### JUC
 1. 结合ReentrantLock源码分析AbstractQueuedSynchronizer(AQS)原理。
 * 内部抽象类Sync继承AQS。
@@ -60,3 +61,44 @@
 ### Redisson分布式锁
 1. Rlock.tryLock：通过lua脚本加锁，判断锁不存在或当前线程持有锁，hincrby创建锁或计数加1，设置过期时间。否则返回剩余时间。未获取锁成功，订阅操作；锁成功，看门狗续期。
 2. unlock：获取解锁表示的锁，获取当前线程的锁，为0结束，否则-1并返回counter，counter>0，设置过期时间，解锁标识；counter=0，释放锁。
+### JDBC连接数据库
+1. 加载驱动
+2. 建立连接
+3. 创建SQL
+4. 获取执行SQL对象
+5. 执行SQL
+6. 返回处理结果
+7. 释放资源
+
+```java
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+class Test {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC";
+        String username = "root";
+        String password = "123456";
+        String sql = "select name, age from user where id = ? and name = ?";
+        // 加载驱动
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        // 建立连接,创建执行sql对象
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // 设置参数
+            preparedStatement.setLong(1, 1L);
+            preparedStatement.setString(2, "student");
+            // 执行SQL并获取返回结果
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String name = resultSet.getString("name");
+                    int age = resultSet.getInt("age");
+                    System.out.println("name: " + name + ", age: " + age);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+}
+```
