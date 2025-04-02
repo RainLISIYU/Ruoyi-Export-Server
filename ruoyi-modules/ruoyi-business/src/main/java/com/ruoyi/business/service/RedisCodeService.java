@@ -30,4 +30,6 @@ public interface RedisCodeService {
      */
     void redisZsetOperation();
 
+    void redissonBloomFilter();
+
 }

@@ -2,12 +2,15 @@ package com.ruoyi.business.service.impl;
 
 import com.ruoyi.business.service.RedisCodeService;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.Redisson;
+import org.redisson.api.RBloomFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +27,9 @@ public class RedisCodeServiceImpl implements RedisCodeService {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private Redisson redisson;
 
     @Override
     public void redisStrOperation() {
@@ -210,5 +216,21 @@ public class RedisCodeServiceImpl implements RedisCodeService {
         log.info("ZSet中2.1到3.2间的成员数：{}", zSetOperations.lexCount("test-zset", Range.closed("2.1", "3.2")));
         // 删除键
         log.info("ZSet删除键：{}", redisTemplate.delete("test-zset"));
+    }
+
+    @Override
+    public void redissonBloomFilter() {
+        // 获取布隆过滤器
+        RBloomFilter<Object> bloomFilterTest = redisson.getBloomFilter("bloomFilterTest");
+        // 初始化
+        bloomFilterTest.tryInit(10000L, 0.02);
+        //
+        redisson.getBucket("/api/v1/test").setIfAbsent("1", Duration.ofHours(1L));
+        // 添加数据
+        bloomFilterTest.add("/api/v1/getUser");
+        bloomFilterTest.add("/api/v1/getInfo");
+        // 判断数据
+        log.info("是否存在getUser:{}", bloomFilterTest.contains("/api/v1/getUser"));
+        log.info("是否存在getStudent:{}", bloomFilterTest.contains("/api/v1/getStudent"));
     }
 }

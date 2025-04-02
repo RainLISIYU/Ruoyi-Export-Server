@@ -3,6 +3,8 @@ package com.ruoyi.business.controller;
 import com.ruoyi.business.config.BaiduAipUtils;
 import com.ruoyi.system.api.RemoteBaiduAipService;
 import jakarta.annotation.Resource;
+import jakarta.websocket.server.PathParam;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

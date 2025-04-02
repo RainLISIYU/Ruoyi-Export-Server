@@ -8,6 +8,7 @@ import com.ruoyi.system.api.RemoteDubboService;
 import com.ruoyi.system.api.RemoteUserService;
 import com.ruoyi.system.api.model.LoginUser;
 import jakarta.annotation.Resource;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.Redisson;
@@ -15,6 +16,7 @@ import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -102,6 +104,7 @@ public class DubboController {
                 .thenRunAsync(() -> redisCodeService.redisStrOperation(), threadPoolExecutor)
                 .thenRunAsync(() -> redisCodeService.redisHashOperation(), threadPoolExecutor)
                 .thenRunAsync(() -> redisCodeService.redisListOperation(), threadPoolExecutor)
+                .thenRunAsync(() -> redisCodeService.redissonBloomFilter(), threadPoolExecutor)
                 .exceptionally(e -> {
                     log.error(e.getMessage());
                     return null;
@@ -114,8 +117,9 @@ public class DubboController {
      *
      * @return 结果
      */
-    @GetMapping("/getUser")
-    public String getUser() {
+    @GetMapping("/getUser/{id}")
+    public String getUser(@PathVariable String id) {
+        System.out.println(id);
         RLock admin = redisson.getLock("admin");
         System.out.println(Thread.currentThread().getName());
         try {
