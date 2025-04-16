@@ -53,6 +53,8 @@ public class ChatController {
                 .defaultOptions(
                         new OllamaOptions.Builder().topP(0.7).build()
                 )
+                .defaultSystem("你需要使用中文回答问题。" +
+                        "你只需要根据提供资料回答问题，不相关的问题回复：无法解决该问题")
                 .build();
     }
 

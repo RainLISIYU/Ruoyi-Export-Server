@@ -21,6 +21,7 @@
         <module>ruoyi-common-es</module>
         <module>ruoyi-common-netty</module>
         <module>ruoyi-common-activity</module>
+        <module>ruoyi-common-mongodb</module>
     </modules>
 
     <artifactId>ruoyi-common</artifactId>

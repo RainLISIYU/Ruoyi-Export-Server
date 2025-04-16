@@ -71,12 +71,14 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-es</artifactId>
+            <version>3.6.3</version>
         </dependency>
 
         <!-- RuoYi Activity -->
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-activity</artifactId>
+            <version>3.6.3</version>
         </dependency>
 
         <!-- RuoYi Common DataSource -->
@@ -95,6 +97,7 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-mq</artifactId>
+            <version>3.6.3</version>
         </dependency>
 
         <!-- RuoYi Common redis -->
@@ -115,6 +118,13 @@
             <artifactId>ruoyi-common-seata</artifactId>
         </dependency>
 
+        <!-- RuoYi Common MongoDB -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common-mongodb</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
         <!-- SpringBoot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -133,6 +143,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.openjdk.jol/jol-core -->
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-core</artifactId>
+            <version>0.16</version>
         </dependency>
 
         <dependency>

@@ -30,6 +30,13 @@ public interface RedisCodeService {
      */
     void redisZsetOperation();
 
+    /**
+     * redisson布隆过滤器测试
+     */
     void redissonBloomFilter();
 
+    /**
+     * redis HyperLogLog操作
+     */
+    void redisHyperOperation();
 }

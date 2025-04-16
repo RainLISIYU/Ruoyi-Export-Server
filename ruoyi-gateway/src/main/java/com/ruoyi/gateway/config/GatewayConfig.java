@@ -52,7 +52,7 @@ public class GatewayConfig
      */
     private void initGatewayRules(){
         Set<GatewayFlowRule> rules = new HashSet<>();
-        rules.add(new GatewayFlowRule("ruoyi-system").setCount(3).setIntervalSec(3).setControlBehavior(RuleConstant.CONTROL_BEHAVIOR_DEFAULT));
+//        rules.add(new GatewayFlowRule("ruoyi-system").setCount(100).setIntervalSec(100).setControlBehavior(RuleConstant.CONTROL_BEHAVIOR_DEFAULT));
         //加载网关限流规则
         GatewayRuleManager.loadRules(rules);
         //加载限流分组

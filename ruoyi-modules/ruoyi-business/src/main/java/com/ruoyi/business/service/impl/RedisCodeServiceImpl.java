@@ -3,7 +3,9 @@ package com.ruoyi.business.service.impl;
 import com.ruoyi.business.service.RedisCodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
+import org.redisson.api.RBlockingDeque;
 import org.redisson.api.RBloomFilter;
+import org.redisson.api.RFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.core.*;
@@ -62,6 +64,11 @@ public class RedisCodeServiceImpl implements RedisCodeService {
         Long expire = redisTemplate.getExpire("str-test");
         Long expire1 = redisTemplate.getExpire("str-test1");
         log.info("str-test过期时间：{}, str-test1过期时间：{}", expire, expire1);
+        // 位图操作
+        strOperations.setBit("bitmap", 2, true);
+        strOperations.setBit("bitmap", 3, true);
+        log.info("bitmap查询:{},{}", strOperations.getBit("bitmap", 2), strOperations.getBit("bitmap", 1));
+        redisTemplate.expire("bit-map", 10, TimeUnit.SECONDS);
     }
 
     @Override
@@ -232,5 +239,22 @@ public class RedisCodeServiceImpl implements RedisCodeService {
         // 判断数据
         log.info("是否存在getUser:{}", bloomFilterTest.contains("/api/v1/getUser"));
         log.info("是否存在getStudent:{}", bloomFilterTest.contains("/api/v1/getStudent"));
+
+        RBlockingDeque<Object> myQueue = redisson.getBlockingDeque("my_queue");
+        myQueue.subscribeOnFirstElements(message -> {
+            return CompletableFuture.runAsync(() -> {
+                log.info("接收消息：{}" ,message);
+            });
+        });
+        myQueue.push("test queue 1");
+        myQueue.push("test queue 2");
+        myQueue.putAsync("test queue async");
+    }
+
+    @Override
+    public void redisHyperOperation() {
+        HyperLogLogOperations hyperLogLogOperations = redisTemplate.opsForHyperLogLog();
+        hyperLogLogOperations.add("hyper-test", "140", "154", "144");
+        redisTemplate.expire("hyper-test", 10, TimeUnit.SECONDS);
     }
 }

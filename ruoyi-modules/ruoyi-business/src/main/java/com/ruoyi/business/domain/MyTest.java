@@ -9,6 +9,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.core.annotation.Excel;
 import com.ruoyi.common.core.web.domain.BaseEntity;
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.vm.VM;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
@@ -65,6 +67,12 @@ public class MyTest extends BaseEntity
         enhancer.setCallback(new DebugMethodInterceptor());
         CgClass cg = (CgClass) enhancer.create();
         cg.send();
+        Enhancer[] enhancers = new Enhancer[2];
+        synchronized (enhancer) {
+            System.out.println(VM.current().details());
+            System.out.println(ClassLayout.parseInstance(enhancer).toPrintable());
+            System.out.println(ClassLayout.parseInstance(enhancers).toPrintable());
+        }
     }
 
 
@@ -80,6 +88,6 @@ class DebugMethodInterceptor implements MethodInterceptor {
 
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-        return proxy.invoke(obj, args);
+        return proxy.invokeSuper(obj, args);
     }
 }

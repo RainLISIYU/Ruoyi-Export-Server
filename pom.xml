@@ -62,6 +62,7 @@
 <!--        <spring-webmvc.version>6.2.0</spring-webmvc.version>-->
         <httputils.version>4.5.13</httputils.version>
         <redission.version>3.45.0</redission.version>
+        <mongodb.version>3.4.4</mongodb.version>
     </properties>
 
     <!-- 依赖声明 -->

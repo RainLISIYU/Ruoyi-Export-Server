@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 本地文件存储
@@ -68,11 +69,11 @@ public class LocalSysFileServiceImpl implements ISysFileService
         }
         // 根据文件MD5值查询文件
         LambdaQueryWrapper<SysFilePo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SysFilePo::getMd5, md5);
-        List<SysFilePo> sysFilePos = sysFileService.list(queryWrapper);
-        if (! sysFilePos.isEmpty()) {
-            SysFilePo sysFilePo = sysFilePos.getFirst();
+        queryWrapper.eq(SysFilePo::getMd5, md5).last("limit 1");
+        SysFilePo sysFilePo = sysFileService.getOne(queryWrapper);
+        if (Objects.nonNull(sysFilePo)) {
             sysFilePo.setId(null);
+            sysFilePo.setUploadTime(LocalDateTime.now());
             sysFileService.save(sysFilePo);
             return sysFilePo;
         }
@@ -83,7 +84,7 @@ public class LocalSysFileServiceImpl implements ISysFileService
         // 远程路径
         String remotePath = localFilePrefix + name;
         // 保存文件信息
-        SysFilePo sysFilePo = new SysFilePo();
+        sysFilePo = new SysFilePo();
         sysFilePo.setLocalPath(localPath);
         sysFilePo.setRemotePath(remotePath);
         sysFilePo.setFileName(file.getOriginalFilename());

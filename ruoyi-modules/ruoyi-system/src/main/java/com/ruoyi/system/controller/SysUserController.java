@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;
@@ -67,6 +68,8 @@ public class SysUserController extends BaseController
     @Autowired
     private Redisson redisson;
 
+    private AtomicInteger atomicInteger = new AtomicInteger(0);
+
     /**
      * 获取用户列表
      */
@@ -74,6 +77,10 @@ public class SysUserController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(SysUser user)
     {
+        atomicInteger.getAndIncrement();
+        if (atomicInteger.get() % 2 == 0) {
+            throw new RuntimeException("模拟异常");
+        }
         startPage();
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);

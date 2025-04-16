@@ -7,16 +7,17 @@
 5. CopyOnWriteArrayList：add方法，加锁并通过复制数组进行添加元素；get方法直接返回，可能读到旧值；删除方法，加锁通过复制数组进行删除元素。
 ### JUC
 1. 结合ReentrantLock源码分析AbstractQueuedSynchronizer(AQS)原理。
-* 内部抽象类Sync继承AQS。
-  * tryLock方法：获取当前线程，获取AQS的state，若state为0，则获取锁，否则判断当前线程是否已获取锁，已获取则state+1，条件都不满足则返回false。
-  * tryRelease方法：c为state-releases，判断当前线程是否获取锁，否则异常，判断c==0，是释放锁，然后更新state；
-  * lock方法：initialTryLock为false -> acquire(1)
-  * AQS的acquire方法：[参考解析](https://blog.csdn.net/TonyAlexer/article/details/144267907)
-  * NonfairSync非公平锁子类。
-    * initialTryLock方法：获取当前线程，CAS赋值state，成功获取锁，否则判断当前线程是否已获取锁，已获取则state+1，条件都不满足则返回false。
-    * tryAcquire方法：获取state==0且CAS赋值，成功获取锁。
-* FairSync公平锁子类。
-  * 方法同上，只是第一次获取锁时增加判断，只有列表的第一个线程可获取锁。
+   * 内部抽象类Sync继承AQS。
+     * tryLock方法：获取当前线程，获取AQS的state，若state为0，则获取锁，否则判断当前线程是否已获取锁，已获取则state+1，条件都不满足则返回false。
+     * tryRelease方法：c为state-releases，判断当前线程是否获取锁，否则异常，判断c==0，是释放锁，然后更新state；
+     * lock方法：initialTryLock为false -> acquire(1)
+     * AQS的acquire方法：[参考解析](https://blog.csdn.net/TonyAlexer/article/details/144267907)
+     * NonfairSync非公平锁子类。
+       * initialTryLock方法：获取当前线程，CAS赋值state，成功获取锁，否则判断当前线程是否已获取锁，已获取则state+1，条件都不满足则返回false。
+       * tryAcquire方法：获取state==0且CAS赋值，成功获取锁。
+   * FairSync公平锁子类。
+     * 方法同上，只是第一次获取锁时增加判断，只有列表的第一个线程可获取锁。
+2. synchronized原理[参考](https://cloud.tencent.com/developer/article/2398496)
 ### Redis底层数据结构[参考](https://blog.csdn.net/kingandsong/article/details/141905788)
 1. 动态字符串（SDS）
    * 由已保存字符串长度（len）、申请总字节数（alloc）、SDS头类型（flags）、字符数组（buf）、结束标识（\0）组成。
