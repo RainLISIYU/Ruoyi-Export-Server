@@ -61,4 +61,14 @@ public class MongoTestController {
         }
     }
 
+    @GetMapping("syncMovies")
+    public R<String> syncMovies() {
+        try {
+            return mongoTestService.syncMovies();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return R.fail(e.getMessage());
+        }
+    }
+
 }

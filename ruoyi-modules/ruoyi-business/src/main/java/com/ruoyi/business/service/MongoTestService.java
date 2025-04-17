@@ -22,4 +22,10 @@ public interface MongoTestService {
      */
     Page<MovieEntity> getMovies(int pageNum, int pageSize, MovieEntity movie);
 
+    /**
+     * 同步数据
+     *
+     * @return 同步结果
+     */
+    R<String> syncMovies();
 }

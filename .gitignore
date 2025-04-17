@@ -48,3 +48,4 @@ nbdist/
 
 ruoyi-ui.zip
 ruoyi-ui/dist.zip
+logs/*
