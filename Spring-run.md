@@ -109,6 +109,7 @@
 <img src="./640.jpg">
 ### SpringBoot AOP源码
 1. 配置类引入。@EnableAspectjAutoProxy中Import导入AspectJAutoProxyRegistrar。
-2. 
+2. AspectJAutoProxyRegistrar：引用ImportBeanDefinitionRegistrar，注册internalAutoProxyCreator的BeanDefinition，然后将EnableAspectJAutoProxy注解的参数值（proxyTargetClass-是否默认使用cglib动态代理，exposeProxy-是否暴露代理对象）设置到注册的BeanDefinition中。
+3. AbstractAutoProxyCreator:
 ### SpringBoot refresh最后一步preInstantiateSingletons流程图
 <img src="./9507f81348e1cf577c545b84291d0448.png" title="preInstantiateSingletons流程图" alt="preInstantiateSingletons流程图" />
