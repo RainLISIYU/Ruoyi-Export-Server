@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.Buckets;
 import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import com.ruoyi.business.domain.ElasticTest;
+import com.ruoyi.common.core.utils.SpringUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -245,6 +248,21 @@ public class EsTest {
             list.add(hit.getContent());
         });
         log.info("聚合查询：{}", list);
+    }
+
+    @Test
+    public void luaTest() {
+        String luaScript = "local key = KEYS[1]\n" +
+                "local value = ARGV[1]\n" +
+                "local ttl = ARGV[2]\n" +
+                "\n" +
+                "redis.call('set', key, value)\n" +
+                "redis.call('expire', key, ttl)\n" +
+                "\n" +
+                "return 1";
+        RedisScript<String> redisScript = RedisScript.of(luaScript, String.class);
+        StringRedisTemplate stringRedisTemplate1 = SpringUtils.getBean("stringRedisTemplate");
+        stringRedisTemplate1.execute(redisScript, List.of("luaTest"), "str", "5000");
     }
 
 }
