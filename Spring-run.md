@@ -78,10 +78,11 @@
             * beforeSingletonCreation(beanName)，检查bean是否排除，并添加到singletonsCurrentlyInCreation。
             * 调用objectFactory.getObject() -> AbstractAutowireCapableBeanFactory.createBean()：
               1. 根据RootBeanDefinition和beanName获取class引用，生成新的RootBeanDefinition。
-              2. 执行resolveBeforeInstantiation（bean实例化前让BeanPostProcessors能够先返回bean的代理，不为空直接返回bean）。
+              2. 执行resolveBeforeInstantiation（bean实例化前让BeanPostProcessors能够先返回bean的代理，AOP配置类的BeforeInstantiation在这里执行，不为空直接返回bean）。
               3. doCreateBean()
                  * 生成BeanWrapper，先从factoryBeanInstanceCache中获取。没有则调用createBeanInstance()：先获取class对象，从beanDefinition中获取InstanceSupplier，存在从里面获取beanWrapper，否则根据beanDefinition中的resolvedConstructorOrFactoryMethod获取，没有再通过其他方式获取构造方法。都没有最终调用instantiateBean方法，通过beanDefinition获取class对象，使用class获取构造方法，通过构造方法实例化bean，使用实例化的bean初始化BeanWrapper，设置BeanWrapper参数返回。
                  * 后续处理，applyMergedBeanDefinitionPostProcessor方法处理属性（eg:CommonAnnotationBeanPostProcessor.postProcessorMergedBeanDefinition获取@PostConstruct、@PreDestroy、@Resource等注解并记录[参考](https://cloud.tencent.com/developer/article/2488672);AutowiredAnnotationBeanPostProcessor处理@Autowired注解[参考](https://cloud.tencent.com/developer/article/2488670)）。
+                 * 将实例化对象存入三级缓存，通过getEarlyBeanReference获取对象（若需代理则返回代理对象）。
                  * populateBean填充上面获取属性值，调用PostProcessor.postProcessProperties方法（eg：CommonAnnotationBeanPostProcessor）。
                  * initializeBean执行beanPostProcessor前置处理，initializingBean接口初始化方法，后置处理。
      * 完成刷新过程，清空资源缓存，初始化生命周期处理器，调用生命处理器的onFresh，发布最后事件
@@ -109,7 +110,42 @@
 <img src="./640.jpg">
 ### SpringBoot AOP源码
 1. 配置类引入。@EnableAspectjAutoProxy中Import导入AspectJAutoProxyRegistrar。
-2. AspectJAutoProxyRegistrar：引用ImportBeanDefinitionRegistrar，注册internalAutoProxyCreator的BeanDefinition，然后将EnableAspectJAutoProxy注解的参数值（proxyTargetClass-是否默认使用cglib动态代理，exposeProxy-是否暴露代理对象）设置到注册的BeanDefinition中。
-3. AbstractAutoProxyCreator:
+2. AspectJAutoProxyRegistrar：引用ImportBeanDefinitionRegistrar，注册AnnotationAwareAspectJAutoProxyCreator的BeanDefinition，然后将EnableAspectJAutoProxy注解的参数值（proxyTargetClass-是否默认使用cglib动态代理，exposeProxy-是否暴露代理对象）设置到注册的BeanDefinition中。-->|
+3. AbstractAutoProxyCreator.postProcessBeforeInstantiation方法：主要功能是解析切面类，获取beanName，判断当前类是否含有切面相关注解的子类（isInfrastructureClass）且 (shouldSkip)                                                                                           |<--| 
+4. AspectJAwareAdvisorAutoProxyCreator.shouldSkip方法：找到Advisor，构建Advisor（BeanFactoryAspectAdvisorsBuilder.buildAspectJAdvisors）。                                                                                                      |<--|
+5. BeanFactoryAspectAdvisorsBuilder.buildAspectJAdvisors方法：处理每个Aspect类，将每个切面方法封装为Advisor(实现类为InstantiationModelAwarePointcutAdvisorImpl)                                                                                  <--|
+6. AbstractAutoProxyCreator.postProcessAfterInitialization方法：找到当前类相关的Advisor，创建代理类（cglib或jdk）
+### SpringBoot 事务源码
+1. TransactionAutoConfiguration：自动配置类。
+2. @EnableTransactionManagement：开启事务管理，引入TransactionManagementConfigurationSelector。
+3. TransactionManagementConfigurationSelector：注册ProxyTransactionManagementConfiguration。
+4. ProxyTransactionManagementConfiguration：注入spring事务核心类BeanFactoryTransactionAttributeSourceAdvisor（beanName为internalTransactionAdvisor）和TransactionInterceptor。
+5. BeanFactoryTransactionAttributeSourceAdvisor：成员变量TransactionAttributeSourcePointcut，用于Aop代理类创建时的判断，实现@Transactional注解的扫描等。
+6. TransactionInterceptor：方法拦截器，对方法进行事务管理。
 ### SpringBoot refresh最后一步preInstantiateSingletons流程图
-<img src="./9507f81348e1cf577c545b84291d0448.png" title="preInstantiateSingletons流程图" alt="preInstantiateSingletons流程图" />
+<img src="./9507f81348e1cf577c545b84291d0448.png" title="preInstantiateSingletons流程图" alt="preInstantiateSingletons流程图">
+
+### Spring @Async源码
+1. @EnableAsync：开启异步注解功能，引入AsyncConfigurationSelector。
+2. AsyncConfigurationSelector：注册代理配置类，默认使用ProxyAsyncConfiguration。
+3. ProxyAsyncConfiguration：根据注解配置值初始化AsyncAnnotationBeanPostProcessor，设置线程池等属性。
+4. AsyncAnnotationBeanPostProcessor：setBeanFactory方法中初始化AsyncAnnotationAdvisor。
+5. AsyncAnnotationAdvisor：含有成员变量Advise（AnnotationAsyncExecutionInterceptor）和Pointcut（AnnotationMatchingPointcut）。
+6. AnnotationAsyncExecutionInterceptor：实现MethodInterceptor接口，拦截方法，使用线程包装切入方法，根据方法返回类型执行不同的线程池方法。
+### Spring @RequestMapping @Controller源码
+1. AbstractHandlerMethodMapping：引用InitializingBean接口，在初始化时调用afterPropertiesSet方法，执行initHandlerMethods方法，初始化HandlerMethods，遍历所有Bean，若类上有@Controller注解（旧版本还会判断是否存在@RequestMapping），遍历每个方法，有@RequestMapping或@HttpExchange构建RequestMappingInfo，与类上的@RequestMapping合并，并保存到Map中。
+2. 处理上述过程拿到的methodMap，将method注册到mappingRegistry中。
+3. register方法：加写锁，封装HandlerMethod，获取mapping（RequestMappingInfo）中的url，以url为key，mapping为value添加到pathLookup中，以mapping为key，封装的MappingRegistration为value，添加到registry中，释放锁。
+### Spring DispatcherServlet源码
+1. 初始化：HttpServletBean.init()方法。
+2. doDispatch方法：拦截并处理所有请求，下面为@Controller请求处理流程。
+   1. getHandler：获取执行链，RequestMappingInfoHandlerMapping中根据url获取HandlerMethod，将HandlerMethod封装为HandlerExecutionChain，过程中设置了拦截器列表。
+   2. getHandlerAdapter：根据handlerMethod获取HandlerAdapter（RequestMappingHandlerAdapter）。
+   3. 执行前置拦截器方法preHandle。
+   4. 执行目标方法。
+   5. 执行后置拦截器方法postHandle，mappingJackson2HttpMessageConverter将返回值转换为json格式。
+   6. 执行拦截器afterCompletion。
+### Spring Mybatis源码解析
+1. @MapperScan：引入MapperScannerRegistrar配置类。
+2. MapperScannerRegistrar：注册MapperScannerConfigurer的BeanDefinition，将注解设置为配置类的属性。
+3. 
