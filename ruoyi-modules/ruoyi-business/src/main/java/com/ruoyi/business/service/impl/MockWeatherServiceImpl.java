@@ -2,7 +2,6 @@ package com.ruoyi.business.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.business.domain.CityCode;
-import com.ruoyi.business.domain.WeatherResult;
 import com.ruoyi.business.service.CityCodeService;
 import com.ruoyi.business.service.MockWeatherService;
 import com.ruoyi.common.core.utils.StringUtils;

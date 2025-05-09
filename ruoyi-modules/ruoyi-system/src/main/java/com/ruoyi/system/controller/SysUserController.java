@@ -78,9 +78,9 @@ public class SysUserController extends BaseController
     public TableDataInfo list(SysUser user)
     {
         atomicInteger.getAndIncrement();
-        if (atomicInteger.get() % 2 == 0) {
-            throw new RuntimeException("模拟异常");
-        }
+//        if (atomicInteger.get() % 2 == 0) {
+//            throw new RuntimeException("模拟异常");
+//        }
         startPage();
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);

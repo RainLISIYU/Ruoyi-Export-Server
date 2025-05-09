@@ -32,7 +32,7 @@ public class ChatModelController {
     @RequestMapping("/chat")
     public String chat(@RequestParam("input") String input) {
         ChatResponse call = chatModel.call(new Prompt(input));
-        return call.getResult().getOutput().getContent();
+        return call.getResult().getOutput().getText();
     }
 
     /**
@@ -42,7 +42,7 @@ public class ChatModelController {
      */
     @RequestMapping("/stream/chat")
     public Flux<String> streamChat(@RequestParam("input") String input) {
-        return chatModel.stream(new Prompt(input)).map(response -> response.getResult().getOutput().getContent());
+        return chatModel.stream(new Prompt(input)).map(response -> response.getResult().getOutput().getText());
     }
 
 }

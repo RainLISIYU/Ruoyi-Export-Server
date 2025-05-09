@@ -1,5 +1,6 @@
 package com.ruoyi.business.test;
 
+import com.ruoyi.Main;
 import com.ruoyi.business.config.BaiduAipUtils;
 import com.ruoyi.business.service.RedisCodeService;
 import com.ruoyi.system.api.RemoteBaiduAipService;
@@ -27,6 +28,10 @@ public class BaiduAiTest {
 
     @Resource
     private RedisCodeService redisCodeService;
+
+    private InheritableThreadLocal<String> threadLocal1 = new InheritableThreadLocal<>();
+
+    private InheritableThreadLocal<String> threadLocal2 = new InheritableThreadLocal<>();
 
     private final AtomicInteger count = new AtomicInteger(1);
     ThreadFactory threadFactory = Thread.ofVirtual().name("Virtual Thread - " + count.getAndIncrement() + " ==> ").factory();
@@ -58,10 +63,13 @@ public class BaiduAiTest {
 
     @Test
     public void futureTest() throws InterruptedException {
+        threadLocal1.set("threadLocal1");
+        threadLocal2.set("threadLocal2");
         CompletableFuture.runAsync(() -> {
-            log.info("==线程执行==");
+            log.info("==子线程执行==,[{},{}]", threadLocal1.get(), threadLocal2.get());
         }, threadPoolExecutor);
         Thread.sleep(1000);
+        log.info("==主线程执行==，[{},{}]", threadLocal1.get(), threadLocal2.get());
     }
 
 }

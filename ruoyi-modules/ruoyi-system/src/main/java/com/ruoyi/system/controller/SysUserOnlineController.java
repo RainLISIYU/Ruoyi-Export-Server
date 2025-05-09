@@ -36,7 +36,7 @@ public class SysUserOnlineController extends BaseController
 
     @RequiresPermissions("monitor:online:list")
     @GetMapping("/list")
-    public TableDataInfo list(@RequestParam("ipaddr") String ipaddr, @RequestParam("userName") String userName)
+    public TableDataInfo list(@RequestParam(value = "ipaddr", required = false) String ipaddr, @RequestParam(value = "userName", required = false) String userName)
     {
         Collection<String> keys = redisService.keys(CacheConstants.LOGIN_TOKEN_KEY + "*");
         List<SysUserOnline> userOnlineList = new ArrayList<SysUserOnline>();

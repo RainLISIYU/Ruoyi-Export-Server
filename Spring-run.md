@@ -148,4 +148,7 @@
 ### Spring Mybatis源码解析
 1. @MapperScan：引入MapperScannerRegistrar配置类。
 2. MapperScannerRegistrar：注册MapperScannerConfigurer的BeanDefinition，将注解设置为配置类的属性。
-3. 
+3. MapperScannerConfigurer：实现了BeanDefinitionRegistryPostProcessor接口，设置参数(FactoryBean设置为MapperFactoryBean)并扫描basePackage路径下的类，注册为BeanDefinition。
+4. MapperFactoryBean：Mapper实例化时调用MapperFactoryBean.getObject方法，返回Mapper的代理对象，最终调用MapperMethod.execute方法。
+5. MybatisMapperMethod：初始化-command（name:类名.方法名，type：SELECT、UPDATE等）和method（解析方法的returnType和参数解析器ParamNameResolver）。执行-execute方法，根据command类型查找sqlSession相应方法执行。
+6. DefaultSqlSession：调用Executor（CacheExecutor和BaseExecutor）执行sql方法。

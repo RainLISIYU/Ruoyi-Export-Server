@@ -19,7 +19,7 @@ public class RuoYiChatApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RuoYiChatApplication.class, args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  聊天模块启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
+        System.out.println("(♥◠‿◠)ﾉﾞ  MCP模块启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
                 " .-------.       ____     __        \n" +
                 " |  _ _   \\      \\   \\   /  /    \n" +
                 " | ( ' )  |       \\  _. /  '       \n" +

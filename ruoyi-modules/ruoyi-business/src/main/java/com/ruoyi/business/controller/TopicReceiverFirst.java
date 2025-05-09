@@ -21,6 +21,7 @@ public class TopicReceiverFirst {
 
     @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
     public void process(String msg, Message message, Channel channel) throws Exception {
+        channel.basicQos(1);
         System.out.println("TopicReceiverFirst消费者1接收消息  : " + msg);
 //        if (LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli() % 2 == 0) {
 //            System.out.println("消费者1拒绝消息：" + msg);
@@ -32,6 +33,7 @@ public class TopicReceiverFirst {
 
     @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
     public void process1(String msg, Message message, Channel channel) throws Exception {
+        channel.basicQos(1);
         System.out.println("TopicReceiverFirst消费者2接收消息：" + msg);
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
     }

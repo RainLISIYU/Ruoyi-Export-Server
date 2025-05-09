@@ -43,9 +43,9 @@ public class RagConfig {
         // 加入向量数据库
         simpleVectorStore.add(documents);
         // 将文档导入向量数据库
-        DocumentReader documentReader = new PagePdfDocumentReader("classpath:/data/spring_ai_alibaba_quickstart.pdf");
-        List<Document> pdfDocuments = documentReader.get();
-        simpleVectorStore.add(pdfDocuments);
+//        DocumentReader documentReader = new PagePdfDocumentReader("classpath:/data/spring_ai_alibaba_quickstart.pdf");
+//        List<Document> pdfDocuments = documentReader.get();
+//        simpleVectorStore.add(pdfDocuments);
         return simpleVectorStore;
     }
 

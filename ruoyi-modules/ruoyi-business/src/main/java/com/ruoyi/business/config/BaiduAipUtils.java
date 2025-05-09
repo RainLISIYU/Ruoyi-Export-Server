@@ -82,7 +82,7 @@ public class BaiduAipUtils {
      */
     public String generationCanonicalRequest(String method, String path, Map<String, String> headers) {
         // 获取CanonicalURI
-        String canonicalURI = getCanonicalURI("", path);
+        String canonicalURI = getCanonicalURI(path);
         // 获取queryString
         String queryString = getQueryString(path);
         // 获取CanonicalHeaders
@@ -94,16 +94,15 @@ public class BaiduAipUtils {
     /**
      * 获取规范URI
      *
-     * @param pathPrefix 过滤前缀
      * @param path 完整url
      * @return 规范URI
      */
-    private String getCanonicalURI(String pathPrefix, String path) {
+    private String getCanonicalURI(String path) {
         // 获取url中?前面的字符串
         String[] pathArr = path.split("\\?");
         String pathStr = pathArr[0];
         // 获取CanonicalURI
-        return pathStr.substring(pathStr.indexOf(pathPrefix) + pathPrefix.length());
+        return pathStr.substring(pathStr.indexOf("") + "".length());
     }
 
     /**
@@ -211,7 +210,7 @@ public class BaiduAipUtils {
     public static void main(String[] args) {
         String method = "PUT";
         String path = "/v1/test/myfolder/readme.txt?partNumber=9&uploadId=a44cc9bab11cbd156984767aad637851";
-        Map headers = new HashMap();
+        Map<String, String> headers = new HashMap<>();
         headers.put("Host", "bj.bcebos.com");
         headers.put("Date", "Mon, 27 Apr 2015 16:23:49 +0800");
         headers.put("Content-Type", "text/plain");

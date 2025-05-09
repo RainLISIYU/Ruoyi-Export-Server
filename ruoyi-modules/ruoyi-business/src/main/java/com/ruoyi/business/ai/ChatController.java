@@ -16,9 +16,13 @@ import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,22 +44,36 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequestMapping("/aiChat")
 public class ChatController {
 
+    @Value("${spring.ai.type}")
+    private String aiType;
+
     private ChatClient chatClient;
 
     @Resource
     private VectorStore myVectorStore;
 
-    public ChatController(ChatModel chatModel) {
-        this.chatClient = ChatClient.builder(chatModel)
+    public ChatController(OllamaChatModel ollamaChatModel, OpenAiChatModel openAiChatModel) {
+        InMemoryChatMemory inMemoryChatMemory = new InMemoryChatMemory();
+        if ("ollama".equals(aiType)) {
+            this.chatClient = ChatClient.builder(ollamaChatModel)
 //                .defaultSystem("You are a teacher.")
-                .defaultAdvisors(new SimpleLoggerAdvisor())
-                .defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
-                .defaultOptions(
-                        new OllamaOptions.Builder().topP(0.7).build()
-                )
-                .defaultSystem("你需要使用中文回答问题。" +
-                        "你只需要根据提供资料回答问题，不相关的问题回复：无法解决该问题")
-                .build();
+                    .defaultAdvisors(new SimpleLoggerAdvisor())
+                    .defaultAdvisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
+                    .defaultOptions(
+                            new OllamaOptions.Builder().topP(0.7).build()
+                    )
+                    .defaultSystem("你需要使用中文回答问题。" +
+                            "你只需要根据提供资料回答问题，不相关的问题回复：无法解决该问题")
+                    .build();
+        } else {
+            this.chatClient = ChatClient.builder(openAiChatModel)
+                    .defaultAdvisors(new SimpleLoggerAdvisor())
+                    .defaultAdvisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
+                    .defaultSystem("你需要使用中文回答问题。" +
+                            "你只需要根据提供资料回答问题，不相关的问题回复：无法解决该问题")
+                    .build();
+        }
+
     }
 
     /**
@@ -81,7 +99,7 @@ public class ChatController {
                 .call()
                 .chatResponse();
         assert chatResponse != null;
-        String content = chatResponse.getResult().getOutput().getContent();
+        String content = chatResponse.getResult().getOutput().getText();
         content = content.replace("\n", "").replace("<think>", "").replace("</think>", "");
         return content;
     }
@@ -103,11 +121,11 @@ public class ChatController {
                 .prompt()
 //                .functions("getWeatherFunction")
                 .user(input)
-                .advisors(new QuestionAnswerAdvisor(myVectorStore))
+//                .advisors(new QuestionAnswerAdvisor(myVectorStore))
                 .advisors(advisor ->
                         advisor
                                 .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, finalChatId)
-                                .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY, 100))
+                                .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 .stream()
                 .content();
         AtomicReference<String> content = new AtomicReference<>("");
@@ -131,7 +149,7 @@ public class ChatController {
     public ChatResponse chatResponse(@RequestParam("input") String input) {
         ChatResponse chatResponse = chatClient.prompt(input).call().chatResponse();
         assert chatResponse != null;
-        String content = chatResponse.getResult().getOutput().getContent();
+        String content = chatResponse.getResult().getOutput().getText();
         content = content.replace("\n", "").replace("<think>", "");
         return chatResponse;
     }
