@@ -75,12 +75,8 @@ public class SysUserController extends BaseController
      */
     @RequiresPermissions("system:user:list")
     @GetMapping("/list")
-    public TableDataInfo list(SysUser user)
-    {
+    public TableDataInfo list(SysUser user) throws InterruptedException {
         atomicInteger.getAndIncrement();
-//        if (atomicInteger.get() % 2 == 0) {
-//            throw new RuntimeException("模拟异常");
-//        }
         startPage();
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);

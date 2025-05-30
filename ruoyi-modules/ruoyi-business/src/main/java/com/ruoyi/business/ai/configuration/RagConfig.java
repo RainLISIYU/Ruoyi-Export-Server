@@ -3,10 +3,14 @@ package com.ruoyi.business.ai.configuration;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,13 +24,26 @@ import java.util.List;
 @Configuration
 public class RagConfig {
 
+    @Value("${spring.ai.openai.api-key}")
+    private String apiKey;
+
+    @Value("${spring.ai.openai.base-url}")
+    private String baseUrl;
+
+    @Bean
+    @ConditionalOnMissingBean
+    public EmbeddingModel embeddingModel() {
+        OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(baseUrl).apiKey(apiKey).build();
+        return new OpenAiEmbeddingModel(openAiApi);
+    }
+
     /**
      * 向量数据库
      *
      * @param embeddingModel 嵌入模型
      * @return 向量数据库
      */
-    @Bean
+//    @Bean
     public VectorStore myVectorStore(EmbeddingModel embeddingModel) {
         SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(embeddingModel).build();
 

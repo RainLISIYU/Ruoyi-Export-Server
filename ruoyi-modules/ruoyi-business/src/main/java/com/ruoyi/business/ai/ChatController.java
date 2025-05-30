@@ -16,9 +16,8 @@ import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.ollama.OllamaChatModel;
-import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,30 +50,31 @@ public class ChatController {
 
     private ChatClient chatClient;
 
-    @Resource
-    private VectorStore myVectorStore;
+//    @Resource
+//    private VectorStore myVectorStore;
 
-    public ChatController(OllamaChatModel ollamaChatModel, OpenAiChatModel openAiChatModel) {
+    public ChatController(OpenAiChatModel openAiChatModel, ToolCallbackProvider tools) {
         InMemoryChatMemory inMemoryChatMemory = new InMemoryChatMemory();
-        if ("ollama".equals(aiType)) {
-            this.chatClient = ChatClient.builder(ollamaChatModel)
-//                .defaultSystem("You are a teacher.")
-                    .defaultAdvisors(new SimpleLoggerAdvisor())
-                    .defaultAdvisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
-                    .defaultOptions(
-                            new OllamaOptions.Builder().topP(0.7).build()
-                    )
-                    .defaultSystem("你需要使用中文回答问题。" +
-                            "你只需要根据提供资料回答问题，不相关的问题回复：无法解决该问题")
-                    .build();
-        } else {
-            this.chatClient = ChatClient.builder(openAiChatModel)
-                    .defaultAdvisors(new SimpleLoggerAdvisor())
-                    .defaultAdvisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
-                    .defaultSystem("你需要使用中文回答问题。" +
-                            "你只需要根据提供资料回答问题，不相关的问题回复：无法解决该问题")
-                    .build();
-        }
+//        if ("ollama".equals(aiType)) {
+//            this.chatClient = ChatClient.builder(ollamaChatModel)
+////                .defaultSystem("You are a teacher.")
+//                    .defaultAdvisors(new SimpleLoggerAdvisor())
+//                    .defaultAdvisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
+//                    .defaultOptions(
+//                            new OllamaOptions.Builder().topP(0.7).build()
+//                    )
+//                    .defaultSystem("你需要使用中文回答问题。" +
+//                            "你只需要根据提供资料回答问题，不相关的问题回复：无法解决该问题")
+//                    .build();
+//        } else {
+        this.chatClient = ChatClient.builder(openAiChatModel)
+                .defaultTools(tools)
+                .defaultAdvisors(new SimpleLoggerAdvisor())
+                .defaultAdvisors(new MessageChatMemoryAdvisor(inMemoryChatMemory))
+                .defaultSystem("你需要使用中文回答问题。" +
+                        "你只需要根据提供资料回答问题，不相关的问题回复：无法解决该问题")
+                .build();
+//        }
 
     }
 
@@ -184,18 +186,18 @@ public class ChatController {
         // 发起聊天
         return chatClient.prompt()
                 .user(input)
-                .advisors(new QuestionAnswerAdvisor(myVectorStore))
+//                .advisors(new QuestionAnswerAdvisor(myVectorStore))
                 .call()
                 .content();
     }
 
-    @GetMapping("/similar")
-    public List<Document> similar(@RequestParam("input") String input) {
-        return myVectorStore.similaritySearch(SearchRequest.builder()
-                .query(input)
-                .topK(5)
-                .similarityThreshold(0.7)
-                .build());
-    }
+//    @GetMapping("/similar")
+//    public List<Document> similar(@RequestParam("input") String input) {
+//        return myVectorStore.similaritySearch(SearchRequest.builder()
+//                .query(input)
+//                .topK(5)
+//                .similarityThreshold(0.7)
+//                .build());
+//    }
 
 }

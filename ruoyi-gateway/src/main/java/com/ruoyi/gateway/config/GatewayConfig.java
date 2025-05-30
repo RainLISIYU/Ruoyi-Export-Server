@@ -71,7 +71,7 @@ public class GatewayConfig
                 add(new ApiPathPredicateItem().setPattern("/system/user/list").setMatchStrategy(SentinelGatewayConstants.URL_MATCH_STRATEGY_PREFIX));
             }
         });
-        definitions.add(sysApi);
+//        definitions.add(sysApi);
         //加载限流分组
         GatewayApiDefinitionManager.loadApiDefinitions(definitions);
     }

@@ -4,6 +4,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
@@ -29,9 +30,9 @@ public class RetrieverController {
     private ChatModel chatModel;
 
     @Autowired
-    public void RestController(VectorStore vectorStore, ChatModel chatModel) {
+    public void RestController(VectorStore vectorStore, OpenAiChatModel openAiChatModel) {
         this.documentRetriever = VectorStoreDocumentRetriever.builder().vectorStore(vectorStore).build();
-        this.chatModel = chatModel;
+        this.chatModel = openAiChatModel;
     }
 
     @GetMapping("/ai/retrieve")

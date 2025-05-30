@@ -3,6 +3,7 @@ package com.ruoyi.business.ai;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +20,8 @@ public class ChatModelController {
 
     private final ChatModel chatModel;
 
-    public ChatModelController(ChatModel chatModel) {
-        this.chatModel = chatModel;
+    public ChatModelController(OpenAiChatModel openAiChatModel) {
+        this.chatModel = openAiChatModel;
     }
 
     /**

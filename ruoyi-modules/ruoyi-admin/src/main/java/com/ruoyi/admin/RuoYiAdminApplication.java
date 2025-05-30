@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableRyFeignClients
 @SpringBootApplication
 public class RuoYiAdminApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(RuoYiAdminApplication.class, args);
         System.out.println("(♥◠‿◠)ﾉﾞ  测试模块启动成功   ლ(´ڡ`ლ)ﾞ  \n" +

@@ -1,10 +1,11 @@
 package com.ruoyi.chat;
 
-import com.ruoyi.common.security.annotation.EnableCustomConfig;
-import com.ruoyi.common.security.annotation.EnableRyFeignClients;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 /**
  * @author lsy
@@ -12,9 +13,12 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @date 2024/7/19
  */
 @EnableAsync
-@EnableCustomConfig
-@EnableRyFeignClients
+// 表示通过aop框架暴露该代理对象,AopContext能够访问
+@EnableAspectJAutoProxy(exposeProxy = true)
+// 指定要扫描的Mapper类的包的路径
+@MapperScan("com.ruoyi.**.mapper")
 @SpringBootApplication
+@EnableWebFlux
 public class RuoYiChatApplication {
 
     public static void main(String[] args) {

@@ -112,9 +112,10 @@
 1. 配置类引入。@EnableAspectjAutoProxy中Import导入AspectJAutoProxyRegistrar。
 2. AspectJAutoProxyRegistrar：引用ImportBeanDefinitionRegistrar，注册AnnotationAwareAspectJAutoProxyCreator的BeanDefinition，然后将EnableAspectJAutoProxy注解的参数值（proxyTargetClass-是否默认使用cglib动态代理，exposeProxy-是否暴露代理对象）设置到注册的BeanDefinition中。-->|
 3. AbstractAutoProxyCreator.postProcessBeforeInstantiation方法：主要功能是解析切面类，获取beanName，判断当前类是否含有切面相关注解的子类（isInfrastructureClass）且 (shouldSkip)                                                                                           |<--| 
-4. AspectJAwareAdvisorAutoProxyCreator.shouldSkip方法：找到Advisor，构建Advisor（BeanFactoryAspectAdvisorsBuilder.buildAspectJAdvisors）。                                                                                                      |<--|
+4. AspectJAwareAdvisorAutoProxyCreator.shouldSkip方法：查找候选Advisor，分别查找实现了Advisor的类和@Aspect的类，构建Advisor（BeanFactoryAspectAdvisorsBuilder.buildAspectJAdvisors），。                                                                                                      |<--|
 5. BeanFactoryAspectAdvisorsBuilder.buildAspectJAdvisors方法：处理每个Aspect类，将每个切面方法封装为Advisor(实现类为InstantiationModelAwarePointcutAdvisorImpl)                                                                                  <--|
-6. AbstractAutoProxyCreator.postProcessAfterInitialization方法：找到当前类相关的Advisor，创建代理类（cglib或jdk）
+6. AbstractAutoProxyCreator.postProcessAfterInitialization方法：判断二级缓存中是否已有该对象或标记不需要代理，直接返回代理对象，否则，判断该类的每个方法，是否符合pointcut表达式，找到当前类相关的Advisor，创建代理类（cglib或jdk）
+7. 总结：aop通过注解启用，注解引入注册配置类，将AnnotationAwareAspectJAutoProxyCreator注册到spring并根据注解设置属性，创建类继承BeanPostProcessor，实现了beanPostProcessorBeforeInitialization和AfterInitialization。实例化前置方法判断当前类为aop配置类则标记当前类不需要代理，判断时会将配置的切面类和自定义的切面类封装为advisor（shouldSkip方法）。后置方法用于创建代理对象。
 ### SpringBoot 事务源码
 1. TransactionAutoConfiguration：自动配置类。
 2. @EnableTransactionManagement：开启事务管理，引入TransactionManagementConfigurationSelector。

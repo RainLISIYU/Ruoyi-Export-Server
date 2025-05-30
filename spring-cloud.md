@@ -16,5 +16,9 @@
 4. 定义自动配置类，分别自动实例化上面3个实例。
 ### 服务发现
 1. 实现接口DiscoveryClient，getInstances(serviceId)获取对应id的服务实例，getServices()获取注册的所有服务名称。
-### 集成ribbon
-
+### Nanos原理
+1. NacosServiceRegistryAutoConfiguration配置类：注册配置类，主要配置类：NacosAutoServiceRegistration，实现ApplicationListener<WebServletInitializedEvent>，Spring启动时触发onApplicationEvent，执行注册操作。
+   * 客户端注册流程图：<img src="./nacos客户端注册逻辑.png">
+2. Nacos服务端处理注册请求流程：<img src="./Nacos服务端处理注册请求流程.png">
+3. Nacos客户端与服务端订阅处理流程：<img src="./Nacos客户端服务端订阅处理流程.png">
+4. Nacos服务端订阅注册处理流程：<img src="./Nacos服务端订阅注册事件处理流程.png">

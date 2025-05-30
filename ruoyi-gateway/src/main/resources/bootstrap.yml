@@ -53,3 +53,11 @@ spring:
             password: nacos123456.
             data-type: json
             rule-type: gw-flow
+
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+logging:
+  level:
+    root: info

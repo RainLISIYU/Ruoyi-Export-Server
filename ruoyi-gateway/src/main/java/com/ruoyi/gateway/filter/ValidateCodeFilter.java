@@ -1,5 +1,6 @@
 package com.ruoyi.gateway.filter;
 
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
@@ -70,9 +71,11 @@ public class ValidateCodeFilter extends AbstractGatewayFilterFactory<Object>
         Flux<DataBuffer> body = serverHttpRequest.getBody();
         AtomicReference<String> bodyRef = new AtomicReference<>();
         body.subscribe(buffer -> {
-            CharBuffer charBuffer = StandardCharsets.UTF_8.decode(buffer.asByteBuffer());
-            DataBufferUtils.release(buffer);
-            bodyRef.set(charBuffer.toString());
+            try(DataBuffer.ByteBufferIterator byteBufferIterator = buffer.readableByteBuffers()) {
+                CharBuffer charBuffer = StandardCharsets.UTF_8.decode(byteBufferIterator.next());
+                DataBufferUtils.release(buffer);
+                bodyRef.set(charBuffer.toString());
+            }
         });
         return bodyRef.get();
     }
