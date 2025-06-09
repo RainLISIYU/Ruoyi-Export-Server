@@ -4,3 +4,4 @@ com.ruoyi.common.mq.configure.RabbitmqConfirmCallback
 com.ruoyi.common.mq.configure.TopicRabbitConfig
 com.ruoyi.common.mq.configure.DeadRabbitConfig
 com.ruoyi.common.mq.configure.MovieRabbitConfig
+com.ruoyi.common.mq.configure.CanalRabbitConfig
