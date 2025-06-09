@@ -86,6 +86,20 @@
             <artifactId>spring-ai-mcp-server-webflux-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.alibaba.otter/canal.client -->
+        <dependency>
+            <groupId>com.alibaba.otter</groupId>
+            <artifactId>canal.client</artifactId>
+            <version>1.1.8</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.alibaba.otter/canal.protocol -->
+        <dependency>
+            <groupId>com.alibaba.otter</groupId>
+            <artifactId>canal.protocol</artifactId>
+            <version>1.1.8</version>
+        </dependency>
+
     </dependencies>
 
     <build>

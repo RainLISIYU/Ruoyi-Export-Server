@@ -38,7 +38,7 @@
      * postProcessBeanFactory - 空方法
      * invokeBeanFactoryPostProcessors(beanFactory)：
        1. 获取BeanFactoryPostProcessors，区分BeanDefinitionRegistryPostProcessor（添加于registryProcessors中）和BeanFactoryPostProcessor（添加到regularPostProcessors中）。
-       2. 获取ConfigurationClassPostProcessor，添加到registryProcessors中，并作为参数执行invokeBeanDefinitionRegistryPostProcessors方法，调用其postProcessBeanDefinitionRegistry -> postProcessBeanDefinitions[解析参考](https://www.cnblogs.com/dw3306/p/17942636)方法。
+       2. 获取ConfigurationClassPostProcessor，添加到registryProcessors中，并作为参数执行invokeBeanDefinitionRegistryPostProcessors方法，调用其postProcessBeanDefinitionRegistry -> postProcessBeanDefinitions(processConfigBeanDefinitions方法)[解析参考](https://www.cnblogs.com/dw3306/p/17942636)方法。
           * 获取ConfigurationClassParser并执行parse方法。
             * 进入ComponentScanAnnotationParser.parse方法，初始化ClassPathBeanDefinitionScanner，设置所需参数。
             * 执行ClassPathBeanDefinitionScanner.doScan()，扫描ComponentScan路径下所有class文件，判断哪些类需要注册为BeanDefinition，例如：注解@Componenet，@Configuration，是否跳过ConditionOn等。
