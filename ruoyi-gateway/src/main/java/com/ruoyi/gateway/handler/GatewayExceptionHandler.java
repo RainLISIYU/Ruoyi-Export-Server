@@ -39,9 +39,8 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler
         {
             msg = "服务未找到";
         }
-        else if (ex instanceof ResponseStatusException)
+        else if (ex instanceof ResponseStatusException responseStatusException)
         {
-            ResponseStatusException responseStatusException = (ResponseStatusException) ex;
             msg = responseStatusException.getMessage();
         }
         else

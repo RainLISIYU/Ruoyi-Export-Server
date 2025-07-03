@@ -2,19 +2,20 @@ package com.ruoyi.business.controller;
 
 import com.ruoyi.business.service.RedisCodeService;
 import com.ruoyi.common.core.constant.SecurityConstants;
+import com.ruoyi.common.core.context.SecurityContextHolder;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.security.utils.SecurityUtils;
 import com.ruoyi.system.api.RemoteBaiduAipService;
 import com.ruoyi.system.api.RemoteDubboService;
 import com.ruoyi.system.api.RemoteUserService;
 import com.ruoyi.system.api.model.LoginUser;
 import jakarta.annotation.Resource;
-import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.rpc.RpcContext;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,6 +74,7 @@ public class DubboController {
      */
     @GetMapping("/getInfo")
     public String getInfo() throws InterruptedException {
+        System.out.println("Dubbo请求线程：" + Thread.currentThread() + ",当前用户：" + SecurityUtils.getUsername());
         RLock admin = redisson.getLock("admin");
         Map<String, Object> headers = new HashMap<>();
         headers.put("content-type", "application/json");
@@ -119,7 +121,7 @@ public class DubboController {
      */
     @GetMapping("/getUser/{id}")
     public String getUser(@PathVariable String id) {
-        System.out.println(id);
+        System.out.println("当前登录用户：" + SecurityUtils.getUsername() + " 请求线程：" + Thread.currentThread());
         RLock admin = redisson.getLock("admin");
         System.out.println(Thread.currentThread().getName());
         try {

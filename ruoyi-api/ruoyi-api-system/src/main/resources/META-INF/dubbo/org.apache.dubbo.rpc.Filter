@@ -1,0 +1,2 @@
+UserInfoSetFilter=com.ruoyi.system.api.filter.UserInfoSetFilter
+UserInfoGetFilter=com.ruoyi.system.api.filter.UserInfoGetFilter

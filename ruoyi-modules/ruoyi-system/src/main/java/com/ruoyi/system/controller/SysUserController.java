@@ -119,6 +119,7 @@ public class SysUserController extends BaseController
     public R<LoginUser> info(@PathVariable("username") String username)
     {
         SysUser sysUser = userService.selectUserByUserName(username);
+        logger.info("当前登录用户：" + SecurityUtils.getUsername() + " 远程调用线程：" + Thread.currentThread());
         if (StringUtils.isNull(sysUser))
         {
             return R.fail("用户名或密码错误");

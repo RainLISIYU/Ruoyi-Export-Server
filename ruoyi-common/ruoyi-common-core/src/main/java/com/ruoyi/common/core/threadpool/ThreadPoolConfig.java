@@ -1,7 +1,4 @@
-package com.ruoyi.common.core.threadpool;/*
- *@Author:cq
- *@Date:2024/6/21 13:53
- */
+package com.ruoyi.common.core.threadpool;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

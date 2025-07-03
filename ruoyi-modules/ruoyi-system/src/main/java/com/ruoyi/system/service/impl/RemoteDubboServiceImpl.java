@@ -1,15 +1,15 @@
 package com.ruoyi.system.service.impl;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.ruoyi.common.core.context.SecurityContextHolder;
 import com.ruoyi.system.api.RemoteDubboService;
 import com.ruoyi.system.api.domain.SysUser;
+import com.ruoyi.system.api.filter.UserInfoGetFilter;
 import com.ruoyi.system.service.ISysUserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.dubbo.rpc.RpcException;
 import org.redisson.Redisson;
-import org.redisson.api.RLock;
 
 import java.util.Objects;
 
@@ -31,6 +31,7 @@ public class RemoteDubboServiceImpl implements RemoteDubboService {
     @Override
     @SentinelResource(value = "getInfo", fallback = "fallbackGetInfo")
     public String getInfo() {
+        System.out.println("Dubbo远程调用线程：" + Thread.currentThread() + ",当前用户：" + UserInfoGetFilter.getUsername());
         SysUser admin = sysUserService.selectUserByUserName("admin");
         String result = "Empty";
         if (! Objects.isNull(admin)) {
