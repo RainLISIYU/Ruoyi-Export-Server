@@ -2,10 +2,13 @@ package com.ruoyi.business.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson2.JSON;
+import com.ruoyi.common.core.constant.SecurityConstants;
+import com.ruoyi.common.core.context.TraceIdContext;
 import com.ruoyi.common.core.utils.uuid.UUID;
 import com.ruoyi.common.mq.configure.DirectRabbitConfig;
 import com.ruoyi.common.mq.configure.TopicRabbitConfig;
 import jakarta.annotation.Resource;
+import org.slf4j.MDC;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
@@ -13,6 +16,7 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitTemplateConfigurer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +37,9 @@ public class RabbitTestController {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     /**
      * direct模式发送
@@ -62,12 +69,16 @@ public class RabbitTestController {
      */
     @GetMapping("/sendTopicMessageFirst")
     public String sendTopicMessageFirst(@RequestParam("msg") String msg) {
+        threadPoolTaskExecutor.execute(() -> {
+            System.out.println("链路追踪测试:" + TraceIdContext.getTraceId());
+        });
         // 封装消息
         Map<String, Object> map = geneMapParam(msg);
         msg = JSON.toJSONString(map);
         // 消息配置
         MessageProperties properties = new MessageProperties();
         properties.setExpiration("5000");
+        properties.setHeader(SecurityConstants.TRACE_ID, TraceIdContext.getTraceId());
         // 设置消息
         Message message = MessageBuilder.withBody(msg.getBytes()).andProperties(properties).setCorrelationId(String.valueOf(map.get("uuid"))).build();
 //        CorrelationData correlationData = new CorrelationData(String.valueOf(map.get("uuid")));

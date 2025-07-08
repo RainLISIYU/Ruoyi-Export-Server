@@ -31,7 +31,7 @@ public class RemoteDubboServiceImpl implements RemoteDubboService {
     @Override
     @SentinelResource(value = "getInfo", fallback = "fallbackGetInfo")
     public String getInfo() {
-        System.out.println("Dubbo远程调用线程：" + Thread.currentThread() + ",当前用户：" + UserInfoGetFilter.getUsername());
+        log.info("Dubbo远程调用线程：" + Thread.currentThread() + ",当前用户：" + UserInfoGetFilter.getUsername());
         SysUser admin = sysUserService.selectUserByUserName("admin");
         String result = "Empty";
         if (! Objects.isNull(admin)) {

@@ -1,9 +1,11 @@
 package com.ruoyi.business.controller;
 
 import com.rabbitmq.client.Channel;
+import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.mq.configure.TopicRabbitConfig;
 import io.netty.util.concurrent.CompleteFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -13,10 +15,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,6 +34,8 @@ public class TopicReceiverFirst {
 
     @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
     public void process(String msg, Message message, Channel channel) throws Exception {
+        String traceId = (String) Optional.ofNullable(message.getMessageProperties().getHeader(SecurityConstants.TRACE_ID)).orElse("");
+        MDC.put(SecurityConstants.TRACE_ID, traceId);
         log.info("1开始时间：{}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         channel.basicQos(1);
         System.out.println("TopicReceiverFirst消费者1接收消息  : " + msg);
@@ -49,6 +50,8 @@ public class TopicReceiverFirst {
 
     @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
     public void process1(String msg, Message message, Channel channel) throws Exception {
+        String traceId = (String) Optional.ofNullable(message.getMessageProperties().getHeader(SecurityConstants.TRACE_ID)).orElse("");
+        MDC.put(SecurityConstants.TRACE_ID, traceId);
         log.info("2开始时间：{}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         channel.basicQos(1);
         System.out.println("TopicReceiverFirst消费者2接收消息：" + msg);

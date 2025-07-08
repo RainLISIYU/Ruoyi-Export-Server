@@ -36,6 +36,18 @@ spring:
     sentinel:
       transport:
         dashboard: 127.0.0.1:8718
+        # nacos配置持久化
+      datasource:
+        ds:
+          nacos:
+            server-addr: 127.0.0.1:8848
+            namespace: d30d8ecb-9dd4-4c56-8a4e-8cc2194158ff
+            dataId: sentinel-ruoyi-business
+            groupId: DEFAULT_GROUP
+            username: nacos
+            password: nacos123456.
+            data-type: json
+            rule-type: gw-flow
 
 logging:
   file:

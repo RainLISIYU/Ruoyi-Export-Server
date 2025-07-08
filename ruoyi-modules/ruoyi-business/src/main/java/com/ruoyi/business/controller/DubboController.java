@@ -16,6 +16,7 @@ import org.apache.dubbo.rpc.RpcContext;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +49,9 @@ public class DubboController {
 
     @Autowired
     private RedisCodeService redisCodeService;
+
+    @Resource
+    private ThreadPoolTaskExecutor traceIdThreadPool;
 
     private final AtomicInteger countA = new AtomicInteger(1);
     ThreadFactory threadFactory = Thread.ofVirtual().name("Virtual Thread - " + countA.getAndIncrement() + " ==> ").factory();
@@ -82,7 +86,7 @@ public class DubboController {
         Map<String, Object> params = new HashMap<>();
         params.put("name", "test");
         params.put("count", 1);
-        System.out.println(remoteBaiduAipService.getSearch(headers, params));
+//        System.out.println(remoteBaiduAipService.getSearch(headers, params));
         System.out.println("非锁库存为：" + (countAsync == 0 ? 0 : --countAsync));
         String result = "Empty";
         try {
@@ -100,13 +104,13 @@ public class DubboController {
         } finally {
             admin.unlock();
         }
-        CompletableFuture<Void> cf1 = CompletableFuture.runAsync(() -> redisCodeService.redisSetOperation(), threadPoolExecutor);
-        CompletableFuture<Void> cf2 = CompletableFuture.runAsync(() -> redisCodeService.redisZsetOperation(), threadPoolExecutor);
+        CompletableFuture<Void> cf1 = CompletableFuture.runAsync(() -> redisCodeService.redisSetOperation(), traceIdThreadPool);
+        CompletableFuture<Void> cf2 = CompletableFuture.runAsync(() -> redisCodeService.redisZsetOperation(), traceIdThreadPool);
         CompletableFuture.allOf(cf1, cf2)
-                .thenRunAsync(() -> redisCodeService.redisStrOperation(), threadPoolExecutor)
-                .thenRunAsync(() -> redisCodeService.redisHashOperation(), threadPoolExecutor)
-                .thenRunAsync(() -> redisCodeService.redisListOperation(), threadPoolExecutor)
-                .thenRunAsync(() -> redisCodeService.redissonBloomFilter(), threadPoolExecutor)
+                .thenRunAsync(() -> redisCodeService.redisStrOperation(), traceIdThreadPool)
+                .thenRunAsync(() -> redisCodeService.redisHashOperation(), traceIdThreadPool)
+                .thenRunAsync(() -> redisCodeService.redisListOperation(), traceIdThreadPool)
+                .thenRunAsync(() -> redisCodeService.redissonBloomFilter(), traceIdThreadPool)
                 .exceptionally(e -> {
                     log.error(e.getMessage());
                     return null;

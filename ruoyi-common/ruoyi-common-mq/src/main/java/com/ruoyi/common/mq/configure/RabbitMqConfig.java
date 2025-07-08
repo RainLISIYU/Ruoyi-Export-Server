@@ -5,6 +5,9 @@ package com.ruoyi.common.mq.configure;/*
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 

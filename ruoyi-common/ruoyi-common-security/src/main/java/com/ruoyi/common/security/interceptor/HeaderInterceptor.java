@@ -1,7 +1,10 @@
 package com.ruoyi.common.security.interceptor;
 
+import com.ruoyi.common.core.context.TraceIdContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import com.ruoyi.common.core.constant.SecurityConstants;
@@ -20,6 +23,9 @@ import com.ruoyi.system.api.model.LoginUser;
  */
 public class HeaderInterceptor implements AsyncHandlerInterceptor
 {
+
+    private final Logger logger = LoggerFactory.getLogger(HeaderInterceptor.class);
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
     {
@@ -31,6 +37,9 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
         SecurityContextHolder.setUserId(ServletUtils.getHeader(request, SecurityConstants.DETAILS_USER_ID));
         SecurityContextHolder.setUserName(ServletUtils.getHeader(request, SecurityConstants.DETAILS_USERNAME));
         SecurityContextHolder.setUserKey(ServletUtils.getHeader(request, SecurityConstants.USER_KEY));
+
+        // 设置链路追踪
+        TraceIdContext.setTraceId(ServletUtils.getHeader(request, SecurityConstants.TRACE_ID));
 
         String token = SecurityUtils.getToken();
         if (StringUtils.isNotEmpty(token))
@@ -50,5 +59,6 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
             throws Exception
     {
         SecurityContextHolder.remove();
+        TraceIdContext.remove();
     }
 }

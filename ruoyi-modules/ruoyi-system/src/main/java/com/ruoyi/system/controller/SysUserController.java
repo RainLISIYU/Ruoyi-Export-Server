@@ -76,7 +76,6 @@ public class SysUserController extends BaseController
     @RequiresPermissions("system:user:list")
     @GetMapping("/list")
     public TableDataInfo list(SysUser user) throws InterruptedException {
-        atomicInteger.getAndIncrement();
         startPage();
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);
@@ -118,6 +117,11 @@ public class SysUserController extends BaseController
     @GetMapping("/info/{username}")
     public R<LoginUser> info(@PathVariable("username") String username)
     {
+        try {
+            Thread.sleep(500L);
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage());
+        }
         SysUser sysUser = userService.selectUserByUserName(username);
         logger.info("当前登录用户：" + SecurityUtils.getUsername() + " 远程调用线程：" + Thread.currentThread());
         if (StringUtils.isNull(sysUser))
