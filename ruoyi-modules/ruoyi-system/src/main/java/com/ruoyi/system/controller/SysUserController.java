@@ -13,6 +13,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -115,6 +117,7 @@ public class SysUserController extends BaseController
      */
     @InnerAuth
     @GetMapping("/info/{username}")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public R<LoginUser> info(@PathVariable("username") String username)
     {
         try {
@@ -127,6 +130,14 @@ public class SysUserController extends BaseController
         if (StringUtils.isNull(sysUser))
         {
             return R.fail("用户名或密码错误");
+        }
+        SysUser newUser = new SysUser();
+        newUser.setUserName("事务测试");
+        newUser.setNickName("测试");
+        userService.insertUser(newUser);
+        boolean flag = true;
+        if (flag) {
+            throw new RuntimeException("异常抛出");
         }
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(sysUser);

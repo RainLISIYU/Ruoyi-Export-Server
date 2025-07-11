@@ -153,3 +153,7 @@
 4. MapperFactoryBean：Mapper实例化时调用MapperFactoryBean.getObject方法，返回Mapper的代理对象，最终调用MapperMethod.execute方法。
 5. MybatisMapperMethod：初始化-command（name:类名.方法名，type：SELECT、UPDATE等）和method（解析方法的returnType和参数解析器ParamNameResolver）。执行-execute方法，根据command类型查找sqlSession相应方法执行。
 6. DefaultSqlSession：调用Executor（CacheExecutor和BaseExecutor）执行sql方法。
+### MybatisPlus中mapper解析流程
+1. MybatisPlusAutoConfiguration：自动配置类，注册SqlSessionFactory。
+2. 调用MybatisSqlSessionFactoryBean的getObject方法 -> afterPropertiesSet方法 -> buildSqlSessionFactory方法 获取SqlSessionFactory。
+3. 获取SqlSessionFactory之前，使用xml解析mapper，bindMapperForNamespace，调用MybatisMapperRegistry.addMapper，设置MybatisMapperFactoryBean，。

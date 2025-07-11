@@ -1,5 +1,6 @@
 package com.ruoyi.business.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,6 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MyTest extends BaseEntity
 {
 
+    @TableField(exist = false)
     ThreadLocal<MyTest> threadLocal = ThreadLocal.withInitial(MyTest::new);
     @Serial
     private static final long serialVersionUID = 1L;

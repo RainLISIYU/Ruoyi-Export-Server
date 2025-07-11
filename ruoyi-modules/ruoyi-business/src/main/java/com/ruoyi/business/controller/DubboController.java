@@ -1,14 +1,22 @@
 package com.ruoyi.business.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ruoyi.business.domain.MyTest;
+import com.ruoyi.business.service.IMyTestService;
 import com.ruoyi.business.service.RedisCodeService;
+import com.ruoyi.common.core.constant.Constants;
 import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.context.SecurityContextHolder;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.security.annotation.RequiresLimitation;
 import com.ruoyi.common.security.utils.SecurityUtils;
 import com.ruoyi.system.api.RemoteBaiduAipService;
 import com.ruoyi.system.api.RemoteDubboService;
 import com.ruoyi.system.api.RemoteUserService;
 import com.ruoyi.system.api.model.LoginUser;
+import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
+import io.seata.tm.api.GlobalTransactionContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -25,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,6 +58,9 @@ public class DubboController {
 
     @Autowired
     private RedisCodeService redisCodeService;
+
+    @Resource
+    private IMyTestService myTestService;
 
     @Resource
     private ThreadPoolTaskExecutor traceIdThreadPool;
@@ -77,6 +89,7 @@ public class DubboController {
      * @return 结果
      */
     @GetMapping("/getInfo")
+    @GlobalTransactional
     public String getInfo() throws InterruptedException {
         System.out.println("Dubbo请求线程：" + Thread.currentThread() + ",当前用户：" + SecurityUtils.getUsername());
         RLock admin = redisson.getLock("admin");
@@ -87,6 +100,7 @@ public class DubboController {
         params.put("name", "test");
         params.put("count", 1);
 //        System.out.println(remoteBaiduAipService.getSearch(headers, params));
+        myTestService.update(new LambdaUpdateWrapper<MyTest>().set(MyTest::getAddress, "分布式事务测试").eq(MyTest::getId, 10));
         System.out.println("非锁库存为：" + (countAsync == 0 ? 0 : --countAsync));
         String result = "Empty";
         try {
@@ -123,15 +137,25 @@ public class DubboController {
      *
      * @return 结果
      */
+    @RequiresLimitation(time = 1000)
+    @GlobalTransactional
     @GetMapping("/getUser/{id}")
     public String getUser(@PathVariable String id) {
-        System.out.println("当前登录用户：" + SecurityUtils.getUsername() + " 请求线程：" + Thread.currentThread());
         RLock admin = redisson.getLock("admin");
         System.out.println(Thread.currentThread().getName());
+        // 调用
+        MyTest myTest = myTestService.selectMyTestById(10L);
+        log.info("测试接口调用：{}", myTest.getAddress());
+        Random random = new Random();
+        myTestService.update(new LambdaUpdateWrapper<MyTest>().set(MyTest::getAddress, "分布式事务测试" + random.nextInt(10)).eq(MyTest::getId, 10));
         try {
             if (admin.tryLock(10, TimeUnit.SECONDS)) {
                 System.out.println("feign服务开始");
                 R<LoginUser> userInfo = remoteUserService.getUserInfo("admin", SecurityConstants.INNER);
+                if (RootContext.getXID() != null && userInfo.getCode() == Constants.FAIL) {
+                    // 降级事务回滚
+                    GlobalTransactionContext.reload(RootContext.getXID()).rollback();
+                }
                 LoginUser data = userInfo.getData();
                 log.info(String.valueOf(data));
                 String result = "Empty";
@@ -146,7 +170,6 @@ public class DubboController {
         } finally {
             admin.unlock();
         }
-
         return "Empty";
     }
 
