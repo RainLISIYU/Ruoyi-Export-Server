@@ -120,11 +120,6 @@ public class SysUserController extends BaseController
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public R<LoginUser> info(@PathVariable("username") String username)
     {
-        try {
-            Thread.sleep(500L);
-        } catch (InterruptedException e) {
-            logger.error(e.getMessage());
-        }
         SysUser sysUser = userService.selectUserByUserName(username);
         logger.info("当前登录用户：" + SecurityUtils.getUsername() + " 远程调用线程：" + Thread.currentThread());
         if (StringUtils.isNull(sysUser))
@@ -135,10 +130,6 @@ public class SysUserController extends BaseController
         newUser.setUserName("事务测试");
         newUser.setNickName("测试");
         userService.insertUser(newUser);
-        boolean flag = true;
-        if (flag) {
-            throw new RuntimeException("异常抛出");
-        }
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(sysUser);
         // 权限集合

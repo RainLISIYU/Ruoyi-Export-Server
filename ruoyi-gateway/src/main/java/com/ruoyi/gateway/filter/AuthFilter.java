@@ -1,5 +1,6 @@
 package com.ruoyi.gateway.filter;
 
+import com.ruoyi.common.core.context.TraceIdContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,9 @@ public class AuthFilter implements GlobalFilter, Ordered
         addHeader(mutate, SecurityConstants.USER_KEY, userkey);
         addHeader(mutate, SecurityConstants.DETAILS_USER_ID, userid);
         addHeader(mutate, SecurityConstants.DETAILS_USERNAME, username);
+        // 设置链路追踪id
+        TraceIdContext.setTraceId("");
+        addHeader(mutate, SecurityConstants.TRACE_ID, TraceIdContext.getTraceId());
         // 内部请求来源参数清除
         removeHeader(mutate, SecurityConstants.FROM_SOURCE);
         return chain.filter(exchange.mutate().request(mutate.build()).build());

@@ -70,6 +70,11 @@
             <artifactId>ruoyi-common-datasource</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-api-system</artifactId>
+        </dependency>
+
         <!-- RuoYi Common DataScope -->
         <dependency>
             <groupId>com.ruoyi</groupId>
@@ -80,6 +85,13 @@
         <dependency>
             <groupId>com.ruoyi</groupId>
             <artifactId>ruoyi-common-log</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
 
         <!-- RuoYi Common Swagger -->

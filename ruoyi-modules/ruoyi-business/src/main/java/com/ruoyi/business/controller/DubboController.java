@@ -10,11 +10,14 @@ import com.ruoyi.common.core.context.SecurityContextHolder;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.security.annotation.RequiresLimitation;
 import com.ruoyi.common.security.utils.SecurityUtils;
+import com.ruoyi.system.api.RemoteAdminService;
 import com.ruoyi.system.api.RemoteBaiduAipService;
 import com.ruoyi.system.api.RemoteDubboService;
 import com.ruoyi.system.api.RemoteUserService;
+import com.ruoyi.system.api.domain.SysTcTest;
 import com.ruoyi.system.api.model.LoginUser;
 import io.seata.core.context.RootContext;
+import io.seata.core.exception.TransactionException;
 import io.seata.spring.annotation.GlobalTransactional;
 import io.seata.tm.api.GlobalTransactionContext;
 import jakarta.annotation.Resource;
@@ -25,6 +28,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +59,9 @@ public class DubboController {
 
     @Resource
     private RemoteBaiduAipService remoteBaiduAipService;
+
+    @Resource
+    private RemoteAdminService remoteAdminService;
 
     @Autowired
     private RedisCodeService redisCodeService;
@@ -118,17 +125,18 @@ public class DubboController {
         } finally {
             admin.unlock();
         }
-        CompletableFuture<Void> cf1 = CompletableFuture.runAsync(() -> redisCodeService.redisSetOperation(), traceIdThreadPool);
-        CompletableFuture<Void> cf2 = CompletableFuture.runAsync(() -> redisCodeService.redisZsetOperation(), traceIdThreadPool);
-        CompletableFuture.allOf(cf1, cf2)
-                .thenRunAsync(() -> redisCodeService.redisStrOperation(), traceIdThreadPool)
-                .thenRunAsync(() -> redisCodeService.redisHashOperation(), traceIdThreadPool)
-                .thenRunAsync(() -> redisCodeService.redisListOperation(), traceIdThreadPool)
-                .thenRunAsync(() -> redisCodeService.redissonBloomFilter(), traceIdThreadPool)
-                .exceptionally(e -> {
-                    log.error(e.getMessage());
-                    return null;
-                });
+        // redis操作测试
+//        CompletableFuture<Void> cf1 = CompletableFuture.runAsync(() -> redisCodeService.redisSetOperation(), traceIdThreadPool);
+//        CompletableFuture<Void> cf2 = CompletableFuture.runAsync(() -> redisCodeService.redisZsetOperation(), traceIdThreadPool);
+//        CompletableFuture.allOf(cf1, cf2)
+//                .thenRunAsync(() -> redisCodeService.redisStrOperation(), traceIdThreadPool)
+//                .thenRunAsync(() -> redisCodeService.redisHashOperation(), traceIdThreadPool)
+//                .thenRunAsync(() -> redisCodeService.redisListOperation(), traceIdThreadPool)
+//                .thenRunAsync(() -> redisCodeService.redissonBloomFilter(), traceIdThreadPool)
+//                .exceptionally(e -> {
+//                    log.error(e.getMessage());
+//                    return null;
+//                });
         return result;
     }
 
@@ -137,9 +145,9 @@ public class DubboController {
      *
      * @return 结果
      */
-    @RequiresLimitation(time = 1000)
-    @GlobalTransactional
     @GetMapping("/getUser/{id}")
+    @GlobalTransactional
+    @Transactional
     public String getUser(@PathVariable String id) {
         RLock admin = redisson.getLock("admin");
         System.out.println(Thread.currentThread().getName());
@@ -147,25 +155,31 @@ public class DubboController {
         MyTest myTest = myTestService.selectMyTestById(10L);
         log.info("测试接口调用：{}", myTest.getAddress());
         Random random = new Random();
+        // 主事务
         myTestService.update(new LambdaUpdateWrapper<MyTest>().set(MyTest::getAddress, "分布式事务测试" + random.nextInt(10)).eq(MyTest::getId, 10));
+        System.out.println("feign服务开始");
+        // 子事务1
+        SysTcTest tcTest = new SysTcTest();
+        tcTest.setName("分布式测试" + random.nextInt(10));
+        tcTest.setAddress("地址");
+        R<Boolean> tcOne = remoteAdminService.insert(tcTest, SecurityConstants.INNER);
+        // 子事务2
+        R<LoginUser> userInfo = remoteUserService.getUserInfo("admin", SecurityConstants.INNER);
+        if (RootContext.getXID() != null && (tcOne.getCode() == Constants.FAIL || userInfo.getCode() == Constants.FAIL)) {
+            throw new RuntimeException("远程调用异常抛出");
+        }
+        LoginUser data = userInfo.getData();
+        log.info(String.valueOf(data));
+        String result = "Empty";
+        if (! Objects.isNull(data)) {
+            result = data.getSysUser().getUserName();
+        }
+        System.out.println("feign服务释放");
         try {
             if (admin.tryLock(10, TimeUnit.SECONDS)) {
-                System.out.println("feign服务开始");
-                R<LoginUser> userInfo = remoteUserService.getUserInfo("admin", SecurityConstants.INNER);
-                if (RootContext.getXID() != null && userInfo.getCode() == Constants.FAIL) {
-                    // 降级事务回滚
-                    GlobalTransactionContext.reload(RootContext.getXID()).rollback();
-                }
-                LoginUser data = userInfo.getData();
-                log.info(String.valueOf(data));
-                String result = "Empty";
-                if (! Objects.isNull(data)) {
-                    result = data.getSysUser().getUserName();
-                }
-                System.out.println("feign服务释放");
                 return result;
             }
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             log.error(e.getMessage());
         } finally {
             admin.unlock();

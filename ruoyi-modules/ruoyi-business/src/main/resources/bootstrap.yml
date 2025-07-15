@@ -64,3 +64,4 @@ dubbo:
     subscribed-services: ruoyi-system
   application:
     qos-enable: false
+    serialize-check-status: WARN

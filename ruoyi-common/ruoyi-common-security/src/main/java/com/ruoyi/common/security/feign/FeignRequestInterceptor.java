@@ -47,6 +47,11 @@ public class FeignRequestInterceptor implements RequestInterceptor
             {
                 requestTemplate.header(SecurityConstants.AUTHORIZATION_HEADER, authentication);
             }
+            // 链路追踪id
+            String traceId = headers.get(SecurityConstants.TRACE_ID);
+            if (StringUtils.isNotEmpty(traceId)) {
+                requestTemplate.header(SecurityConstants.TRACE_ID, traceId);
+            }
 
             // 配置客户端IP
             requestTemplate.header("X-Forwarded-For", IpUtils.getIpAddr());

@@ -40,6 +40,7 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
 
         // 设置链路追踪
         TraceIdContext.setTraceId(ServletUtils.getHeader(request, SecurityConstants.TRACE_ID));
+        logger.info("链路追踪id:{}", TraceIdContext.getTraceId());
 
         String token = SecurityUtils.getToken();
         if (StringUtils.isNotEmpty(token))
