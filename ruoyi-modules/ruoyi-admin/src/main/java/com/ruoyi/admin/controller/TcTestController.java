@@ -29,7 +29,7 @@ public class TcTestController {
     @InnerAuth
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public R<Boolean> insert(@RequestBody SysTcTest tcTest) {
-        tcTestService.save(sysToTest(tcTest));
+        tcTestService.saveOrUpdate(sysToTest(tcTest));
         boolean flag = true;
         log.info("当前事务xid:{}", RootContext.getXID());
         return R.ok(flag);
@@ -46,8 +46,6 @@ public class TcTestController {
         tcTest.setId(sysTcTest.getId());
         tcTest.setName(sysTcTest.getName());
         tcTest.setAddress(sysTcTest.getAddress());
-        tcTest.setUpdatedAt(sysTcTest.getUpdatedAt());
-        tcTest.setCreatedAt(sysTcTest.getCreatedAt());
         return tcTest;
     }
 

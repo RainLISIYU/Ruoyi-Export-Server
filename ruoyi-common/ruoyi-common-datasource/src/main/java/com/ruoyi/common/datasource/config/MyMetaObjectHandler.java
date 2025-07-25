@@ -3,6 +3,7 @@ package com.ruoyi.common.datasource.config;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,7 +13,6 @@ import java.time.format.DateTimeFormatter;
  * @description MP新增更新时补充创建时间和更新时间
  * @date 2025/1/8
  */
-@Configuration
 public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {

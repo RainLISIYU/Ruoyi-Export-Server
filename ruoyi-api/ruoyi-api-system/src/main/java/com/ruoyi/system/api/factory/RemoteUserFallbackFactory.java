@@ -8,6 +8,7 @@ import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.api.RemoteUserService;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.model.LoginUser;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +29,7 @@ public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserServ
         log.error("用户服务调用失败:{}", throwable.getMessage());
         return new RemoteUserService()
         {
+            @GetMapping("/user/info/{username}")
             @Override
             public R<LoginUser> getUserInfo(String username, String source)
             {

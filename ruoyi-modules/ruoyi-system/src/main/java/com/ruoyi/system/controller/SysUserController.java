@@ -1,13 +1,14 @@
 package com.ruoyi.system.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ruoyi.system.domain.SysVideoMessage;
+import com.ruoyi.system.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;
 import org.redisson.Redisson;
@@ -15,6 +16,7 @@ import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,12 +35,6 @@ import com.ruoyi.system.api.domain.SysDept;
 import com.ruoyi.system.api.domain.SysRole;
 import com.ruoyi.system.api.domain.SysUser;
 import com.ruoyi.system.api.model.LoginUser;
-import com.ruoyi.system.service.ISysConfigService;
-import com.ruoyi.system.service.ISysDeptService;
-import com.ruoyi.system.service.ISysPermissionService;
-import com.ruoyi.system.service.ISysPostService;
-import com.ruoyi.system.service.ISysRoleService;
-import com.ruoyi.system.service.ISysUserService;
 
 /**
  * 用户信息
@@ -66,6 +62,9 @@ public class SysUserController extends BaseController
 
     @Autowired
     private ISysConfigService configService;
+
+    @Autowired
+    private SysVideoMessageService videoMessageService;
 
     @Autowired
     private Redisson redisson;
@@ -126,10 +125,10 @@ public class SysUserController extends BaseController
         {
             return R.fail("用户名或密码错误");
         }
-        SysUser newUser = new SysUser();
-        newUser.setUserName("事务测试");
-        newUser.setNickName("测试");
-        userService.insertUser(newUser);
+        // 事务更新
+        videoMessageService.update(new LambdaUpdateWrapper<SysVideoMessage>().set(SysVideoMessage::getName, "分布式" + new Random().nextInt(10)).eq(SysVideoMessage::getId, 1L));
+        // 事务回滚
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(sysUser);
         // 权限集合

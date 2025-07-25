@@ -1,11 +1,9 @@
 package com.ruoyi.common.mq.configure;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -138,5 +136,16 @@ public class TopicRabbitConfig {
                 .to(topicExchange()).with(TOPIC_TTL_KEY);
     }
 
+    @Bean("batchQueueRabbitListenerContainerFactory")
+    public SimpleRabbitListenerContainerFactory batchQueueRabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        // 批量设置
+        factory.setBatchListener(true);
+        factory.setConsumerBatchEnabled(true);
+        factory.setBatchSize(2);
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        return factory;
+    }
 
 }

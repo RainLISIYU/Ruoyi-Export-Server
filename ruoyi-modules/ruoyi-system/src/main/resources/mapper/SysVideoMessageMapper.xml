@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysVideoMessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.SysVideoMessage">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="file" column="file" jdbcType="BIGINT"/>
+            <result property="deletedAt" column="deleted_at" jdbcType="TINYINT"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="udpatedAt" column="udpated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,file,
+        deleted_at,created_at,udpated_at
+    </sql>
+</mapper>

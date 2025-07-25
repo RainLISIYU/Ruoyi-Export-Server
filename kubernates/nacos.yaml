@@ -123,7 +123,7 @@ metadata:
   name: nacos-config
   namespace: nacos-namespace
 data:
-  nacos.mode: "standalone"
+  nacos.mode: "cluster"
   mysql.db.name: ry-config
   mysql.host: 120.25.106.163
   mysql.password: lsy19980104

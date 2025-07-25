@@ -1,1 +1,2 @@
 com.ruoyi.common.datasource.config.SqlMybatisPlusConfig
+com.ruoyi.common.datasource.config.MyMetaObjectHandler

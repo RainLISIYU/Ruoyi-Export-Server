@@ -160,6 +160,7 @@ public class DubboController {
         System.out.println("feign服务开始");
         // 子事务1
         SysTcTest tcTest = new SysTcTest();
+        tcTest.setId(1944937881790541826L);
         tcTest.setName("分布式测试" + random.nextInt(10));
         tcTest.setAddress("地址");
         R<Boolean> tcOne = remoteAdminService.insert(tcTest, SecurityConstants.INNER);

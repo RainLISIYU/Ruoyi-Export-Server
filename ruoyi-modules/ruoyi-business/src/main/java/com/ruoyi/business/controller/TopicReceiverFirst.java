@@ -9,6 +9,7 @@ import org.slf4j.MDC;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -30,9 +31,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Component
 @Slf4j
-public class TopicReceiverFirst {
+public class TopicReceiverFirst implements ChannelAwareMessageListener {
 
-    @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
+//    @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
     public void process(String msg, Message message, Channel channel) throws Exception {
         String traceId = (String) Optional.ofNullable(message.getMessageProperties().getHeader(SecurityConstants.TRACE_ID)).orElse("");
         MDC.put(SecurityConstants.TRACE_ID, traceId);
@@ -48,7 +49,7 @@ public class TopicReceiverFirst {
         log.info("1结束时间：{}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 
-    @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
+//    @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE)
     public void process1(String msg, Message message, Channel channel) throws Exception {
         String traceId = (String) Optional.ofNullable(message.getMessageProperties().getHeader(SecurityConstants.TRACE_ID)).orElse("");
         MDC.put(SecurityConstants.TRACE_ID, traceId);
@@ -257,4 +258,28 @@ public class TopicReceiverFirst {
         }
     }
 
+    @Override
+    public void onMessage(Message message, Channel channel) throws Exception {
+
+    }
+
+    @RabbitListener(queues = TopicRabbitConfig.TOPIC_FIRST_QUEUE, containerFactory = "batchQueueRabbitListenerContainerFactory")
+    @Override
+    public void onMessageBatch(List<Message> messages, Channel channel) {
+        try {
+            log.info(TopicRabbitConfig.TOPIC_FIRST_QUEUE + " 收到{}条消息", messages.size());
+            int i = 0;
+            for (Message message : messages) {
+                log.info("收到消息{}:{}", ++i,  new String(message.getBody()));
+            }
+            channel.basicAck(messages.size(), true);
+        } catch (Exception e) {
+            log.error("消息处理失败：{}", e.getMessage());
+            try {
+                channel.basicNack(messages.size(), true, true);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
 }
