@@ -1,6 +1,8 @@
 package com.ruoyi.file.service.impl;
 
 import java.io.InputStream;
+import java.util.List;
+
 import com.alibaba.nacos.common.utils.IoUtils;
 import com.ruoyi.file.domain.SysFilePo;
 import com.ruoyi.file.mapper.SysFileMapper;
@@ -58,6 +60,11 @@ public class FastDfsSysFileServiceImpl implements ISysFileService
 
     @Override
     public String uploadFile(MultipartFile file, String localPath) throws Exception {
+        return null;
+    }
+
+    @Override
+    public List<SysFilePo> uploadFiles(MultipartFile[] files) {
         return null;
     }
 }

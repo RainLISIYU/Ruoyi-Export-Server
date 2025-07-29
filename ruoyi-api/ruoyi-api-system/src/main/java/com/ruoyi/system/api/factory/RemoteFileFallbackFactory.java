@@ -35,6 +35,11 @@ public class RemoteFileFallbackFactory implements FallbackFactory<RemoteFileServ
             }
 
             @Override
+            public R<List<SysFile>> uploadFiles(MultipartFile[] file) {
+                return R.fail("批量上传失败");
+            }
+
+            @Override
             public R<List<SysFile>> listFiles(Collection<Long> fileIds, String source) {
                 return R.fail("查询失败：" + throwable.getMessage());
             }

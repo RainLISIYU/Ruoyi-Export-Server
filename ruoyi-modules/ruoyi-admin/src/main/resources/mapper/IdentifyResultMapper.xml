@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.admin.mapper.IdentifyResultMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.admin.domain.IdentifyResult">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="no" column="no" jdbcType="VARCHAR"/>
+            <result property="certificateNo" column="certificate_no" jdbcType="VARCHAR"/>
+            <result property="equipmentName" column="equipment_name" jdbcType="VARCHAR"/>
+            <result property="model" column="model" jdbcType="VARCHAR"/>
+            <result property="factoryNumber" column="factory_number" jdbcType="VARCHAR"/>
+            <result property="sampleNumber" column="sample_number" jdbcType="VARCHAR"/>
+            <result property="factoryName" column="factory_name" jdbcType="VARCHAR"/>
+            <result property="accuracyClass" column="accuracy_class" jdbcType="VARCHAR"/>
+            <result property="range" column="range" jdbcType="VARCHAR"/>
+            <result property="resolution" column="resolution" jdbcType="VARCHAR"/>
+            <result property="appraisalDate" column="appraisal_date" jdbcType="VARCHAR"/>
+            <result property="effectivePeriod" column="effective_period" jdbcType="INTEGER"/>
+            <result property="appraisalResult" column="appraisal_result" jdbcType="VARCHAR"/>
+            <result property="measuringStandard" column="measuring_standard" jdbcType="BIGINT"/>
+            <result property="appraisalAddress" column="appraisal_address" jdbcType="VARCHAR"/>
+            <result property="temperature" column="temperature" jdbcType="VARCHAR"/>
+            <result property="humidity" column="humidity" jdbcType="VARCHAR"/>
+            <result property="deletedAt" column="deleted_at" jdbcType="TINYINT"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updatedAt" column="updated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,no,certificate_no,
+        equipment_name,model,factory_number,
+        sample_number,factory_name,accuracy_class,
+        range,resolution,appraisal_date,
+        effective_period,appraisal_result,measuring_standard,
+        appraisal_address,temperature,humidity,
+        deleted_at,created_at,updated_at
+    </sql>
+</mapper>

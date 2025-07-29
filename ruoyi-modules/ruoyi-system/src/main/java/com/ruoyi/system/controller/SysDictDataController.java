@@ -2,17 +2,13 @@ package com.ruoyi.system.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.security.annotation.InnerAuth;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.web.controller.BaseController;
@@ -82,6 +78,21 @@ public class SysDictDataController extends BaseController
             data = new ArrayList<SysDictData>();
         }
         return success(data);
+    }
+
+    /**
+     * 远程调用字典接口
+     * @param dictType 字典类型
+     * @return 字典数据
+     */
+    @InnerAuth
+    @GetMapping("/feignDictType")
+    public R<List<SysDictData>> feignDictType(@RequestParam("dictType") String dictType) {
+        List<SysDictData> data = dictTypeService.selectDictDataByType(dictType);
+        if (StringUtils.isNull(data)) {
+            data = new ArrayList<>();
+        }
+        return R.ok(data);
     }
 
     /**

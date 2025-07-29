@@ -5,6 +5,8 @@ import com.ruoyi.file.domain.SysFilePo;
 import com.ruoyi.file.service.ISysFileService;
 import com.ruoyi.file.service.SysFileService;
 import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -12,10 +14,10 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.file.utils.FileUploadUtils;
 
-import java.io.File;
 import java.io.InputStream;
-import java.nio.channels.FileChannel;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +30,8 @@ import java.util.Objects;
 @Service
 public class LocalSysFileServiceImpl implements ISysFileService
 {
+
+    private Logger logger = LoggerFactory.getLogger(LocalSysFileServiceImpl.class);
 
     @Resource
     private SysFileService sysFileService;
@@ -67,6 +71,7 @@ public class LocalSysFileServiceImpl implements ISysFileService
         try (InputStream inputStream = file.getInputStream()) {
             md5 = DigestUtils.md5DigestAsHex(inputStream);
         }
+
         // 根据文件MD5值查询文件
         LambdaQueryWrapper<SysFilePo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SysFilePo::getMd5, md5).last("limit 1");
@@ -108,6 +113,53 @@ public class LocalSysFileServiceImpl implements ISysFileService
     public String uploadFile(MultipartFile file, String localPath) throws Exception {
         String name = FileUploadUtils.upload(localPath, file);
         return domain + localFilePrefix + name;
+    }
+
+    @Override
+    public List<SysFilePo> uploadFiles(MultipartFile[] files) throws Exception {
+
+        List<SysFilePo> sysFilePos = new ArrayList<>();
+        if (files.length == 0) {
+            return sysFilePos;
+        }
+        for (MultipartFile file : files) {
+            // 上传文件大小
+            long fileSize = file.getSize() / 1024;
+            // 获取文件MD5值
+            String md5 = "";
+            try (InputStream inputStream = file.getInputStream()) {
+                md5 = DigestUtils.md5DigestAsHex(inputStream);
+            }
+            // 根据文件MD5值查询文件
+            LambdaQueryWrapper<SysFilePo> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(SysFilePo::getMd5, md5).last("limit 1");
+            SysFilePo sysFilePo = sysFileService.getOne(queryWrapper);
+            if (Objects.nonNull(sysFilePo)) {
+                sysFilePo.setId(null);
+                sysFilePo.setUploadTime(LocalDateTime.now());
+                sysFilePos.add(sysFilePo);
+                continue;
+            }
+            // 上传文件并返回相对路径
+            String name = FileUploadUtils.upload(localFilePath, file);
+            // 服务器本地路径
+            String localPath = localFilePath + name;
+            // 远程路径
+            String remotePath = localFilePrefix + name;
+            // 保存文件信息
+            sysFilePo = new SysFilePo();
+            sysFilePo.setLocalPath(localPath);
+            sysFilePo.setRemotePath(remotePath);
+            sysFilePo.setFileName(file.getOriginalFilename());
+            sysFilePo.setFileSize(String.valueOf(fileSize));
+            sysFilePo.setUploadTime(LocalDateTime.now());
+            sysFilePo.setMd5(md5);
+            sysFilePos.add(sysFilePo);
+        }
+        // 保存文件
+        sysFileService.saveBatch(sysFilePos);
+        // 返回
+        return sysFilePos;
     }
 
 }

@@ -1,7 +1,11 @@
 package com.ruoyi.common.security.utils;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.alibaba.fastjson2.JSONArray;
 import com.ruoyi.common.core.constant.CacheConstants;
 import com.ruoyi.common.core.utils.SpringUtils;
@@ -71,5 +75,19 @@ public class DictUtils
     public static String getCacheKey(String configKey)
     {
         return CacheConstants.SYS_DICT_KEY + configKey;
+    }
+
+    /**
+     * 将查询的字典数据转为map
+     *
+     * @param dictData 字典数据
+     * @return 字典map（dict_label : dict_value）
+     */
+    public static Map<String, String> dictDataToMap(List<SysDictData> dictData) {
+        Map<String, String> dataMap = new HashMap<>();
+        if (StringUtils.isNull(dictData) || dictData.isEmpty()) {
+            return dataMap;
+        }
+        return dictData.stream().collect(Collectors.toMap(SysDictData::getDictLabel, SysDictData::getDictValue));
     }
 }

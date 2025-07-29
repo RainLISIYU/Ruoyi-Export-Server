@@ -62,6 +62,32 @@ public class SysFileController
         }
     }
 
+    @PostMapping("uploadFiles")
+    public R<List<SysFile>> uploadFiles(@RequestParam("file") MultipartFile[] file) {
+        log.info("上传文件开始");
+        List<SysFilePo> files;
+        try {
+            // 文件上传保存
+            files = sysFileService.uploadFiles(file);
+        } catch (Exception e) {
+            log.error("上传文件失败", e);
+            return R.fail(e.getMessage());
+        }
+        // 处理返回结果
+        List<SysFile> sysFiles = new ArrayList<>();
+        if (files.isEmpty()) {
+            return R.ok(sysFiles);
+        }
+        files.forEach(sysFilePo -> {
+            SysFile sysFile = new SysFile();
+            sysFile.setName(FileUtils.getName(sysFilePo.getRemotePath()));
+            sysFile.setUrl(sysFilePo.getRemotePath());
+            sysFile.setId(sysFilePo.getId());
+            sysFiles.add(sysFile);
+        });
+        return R.ok(sysFiles);
+    }
+
     /**
      * 根据文件id查询文件信息
      *

@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ruoyi.system.domain.SysVideoMessage;
 import com.ruoyi.system.service.*;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
@@ -43,6 +44,7 @@ import com.ruoyi.system.api.model.LoginUser;
  */
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class SysUserController extends BaseController
 {
     @Autowired
@@ -77,6 +79,7 @@ public class SysUserController extends BaseController
     @RequiresPermissions("system:user:list")
     @GetMapping("/list")
     public TableDataInfo list(SysUser user) throws InterruptedException {
+        log.info("查询用户信息");
         startPage();
         List<SysUser> list = userService.selectUserList(user);
         return getDataTable(list);
@@ -276,7 +279,7 @@ public class SysUserController extends BaseController
     @RequiresPermissions("system:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
-    public AjaxResult remove(@PathVariable Long[] userIds)
+    public AjaxResult remove(@PathVariable("userIds") Long[] userIds)
     {
         if (ArrayUtils.contains(userIds, SecurityUtils.getUserId()))
         {

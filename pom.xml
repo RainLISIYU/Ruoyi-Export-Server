@@ -32,13 +32,14 @@
         <pagehelper.boot.version>2.0.0</pagehelper.boot.version>
         <druid.version>1.2.22</druid.version>
         <dynamic-ds.version>4.2.0</dynamic-ds.version>
-        <commons.io.version>2.13.0</commons.io.version>
+        <commons.io.version>2.20.0</commons.io.version>
         <commons.collections4.version>4.4</commons.collections4.version>
         <velocity.version>2.3</velocity.version>
         <fastjson.version>2.0.43</fastjson.version>
         <jjwt.version>0.9.1</jjwt.version>
         <minio.version>8.2.2</minio.version>
-        <poi.version>5.3.0</poi.version>
+        <poi.version>5.4.0</poi.version>
+        <poi-tl.version>1.12.2</poi-tl.version>
         <jakarta.version>2.1.1</jakarta.version>
         <jakarta-api.version>6.0.0</jakarta-api.version>
         <jackson.version>2.16.0</jackson.version>
@@ -155,6 +156,13 @@
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.deepoove/poi-tl -->
+            <dependency>
+                <groupId>com.deepoove</groupId>
+                <artifactId>poi-tl</artifactId>
+                <version>${poi-tl.version}</version>
             </dependency>
 
             <!-- 代码生成使用模板 -->

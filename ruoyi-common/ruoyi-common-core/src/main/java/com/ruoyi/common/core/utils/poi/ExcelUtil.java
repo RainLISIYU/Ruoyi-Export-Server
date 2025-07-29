@@ -9,15 +9,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.ruoyi.common.core.exception.UtilException;
@@ -149,6 +141,11 @@ public class ExcelUtil<T>
     public Class<T> clazz;
 
     /**
+     * 批处理次数
+     */
+    private Integer times = 0;
+
+    /**
      * 需要排除列属性
      */
     public String[] excludeFields;
@@ -265,7 +262,20 @@ public class ExcelUtil<T>
      */
     public List<T> importExcel(InputStream is, int titleNum) throws Exception
     {
-        return importExcel(StringUtils.EMPTY, is, titleNum);
+        return importExcel(StringUtils.EMPTY, is, titleNum, null, true);
+    }
+
+    /**
+     * 分批导入数据，每次batchSize条
+     *
+     * @param is 输入刘
+     * @param titleNum 标题行数
+     * @param batchSize 每次导入量
+     * @return 导入数据
+     * @throws Exception 异常
+     */
+    public List<T> importExcel(InputStream is, int titleNum, Integer batchSize, boolean isStart) throws Exception {
+        return importExcel(StringUtils.EMPTY, is, titleNum, batchSize, isStart);
     }
 
     /**
@@ -274,12 +284,16 @@ public class ExcelUtil<T>
      * @param sheetName 表格索引名
      * @param titleNum 标题占用行数
      * @param is 输入流
+     * @param batchSize 批处理数据量
      * @return 转换后集合
      */
-    public List<T> importExcel(String sheetName, InputStream is, int titleNum) throws Exception
+    public List<T> importExcel(String sheetName, InputStream is, int titleNum, Integer batchSize, boolean isStart) throws Exception
     {
         this.type = Type.IMPORT;
-        this.wb = WorkbookFactory.create(is);
+        if (isStart) {
+            this.wb = WorkbookFactory.create(is);
+            this.times = 0;
+        }
         List<T> list = new ArrayList<T>();
         // 如果指定sheet名,则取指定sheet中的内容 否则默认指向第1个sheet
         Sheet sheet = StringUtils.isNotEmpty(sheetName) ? wb.getSheet(sheetName) : wb.getSheetAt(0);
@@ -322,7 +336,11 @@ public class ExcelUtil<T>
                     fieldsMap.put(column, objects);
                 }
             }
-            for (int i = titleNum + 1; i <= rows; i++)
+            // 是否需要分批处理
+            int i = batchSize == null || batchSize < 1 ? titleNum + 1 : titleNum + 1 + times * batchSize;
+            int size = batchSize == null || batchSize < 1 ? rows : Math.min(rows, i + batchSize - 1);
+            times++;
+            for (; i <= size; i++)
             {
                 // 从第2行开始取数据,默认第一行是表头.
                 Row row = sheet.getRow(i);
@@ -337,7 +355,7 @@ public class ExcelUtil<T>
                     Object val = this.getCellValue(row, entry.getKey());
 
                     // 如果不存在实例则新建.
-                    entity = (entity == null ? clazz.newInstance() : entity);
+                    entity = (entity == null ? clazz.getDeclaredConstructor().newInstance() : entity);
                     // 从map中得到对应列的field.
                     Field field = (Field) entry.getValue()[0];
                     Excel attr = (Excel) entry.getValue()[1];
@@ -418,6 +436,10 @@ public class ExcelUtil<T>
                 }
                 list.add(entity);
             }
+        }
+        // 非分批处理或最后一批处理,关闭wb
+        if (batchSize == null || list.isEmpty()) {
+            wb.close();
         }
         return list;
     }

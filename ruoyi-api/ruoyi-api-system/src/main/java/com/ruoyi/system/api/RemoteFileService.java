@@ -31,6 +31,15 @@ public interface  RemoteFileService
     public R<SysFile> upload(@RequestPart(value = "file") MultipartFile file);
 
     /**
+     * 批量上传文件
+     *
+     * @param file 文件信息
+     * @return 结果
+     */
+    @PostMapping(value = "/uploadFiles", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public R<List<SysFile>> uploadFiles(@RequestPart(value = "file") MultipartFile[] file);
+
+    /**
      * 根据文件id查询文件信息
      *
      * @param fileIds 文件id集合

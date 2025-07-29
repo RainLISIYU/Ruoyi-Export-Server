@@ -14,9 +14,7 @@
         <module>ruoyi-job</module>
         <module>ruoyi-file</module>
         <module>ruoyi-admin</module>
-        <module>ruoyi-business</module>
         <module>ruoyi-state</module>
-        <module>ruoyi-chat</module>
     </modules>
 
     <artifactId>ruoyi-modules</artifactId>

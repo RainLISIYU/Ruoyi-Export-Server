@@ -3,6 +3,8 @@ package com.ruoyi.file.service;
 import com.ruoyi.file.domain.SysFilePo;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * 文件上传接口
  * 
@@ -27,4 +29,12 @@ public interface ISysFileService
      * @return 访问地址
      */
     String uploadFile(MultipartFile file, String localPath) throws Exception;
+
+    /**
+     * 批量上传文件
+     *
+     * @param files 文件
+     * @return 保存结果
+     */
+    List<SysFilePo> uploadFiles(MultipartFile[] files) throws Exception;
 }

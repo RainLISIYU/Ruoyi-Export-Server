@@ -3,6 +3,8 @@ package com.ruoyi.common.core.web.controller;
 import java.beans.PropertyEditorSupport;
 import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.WebDataBinder;
@@ -67,6 +69,21 @@ public class BaseController
         rspData.setRows(list);
         rspData.setMsg("查询成功");
         rspData.setTotal(new PageInfo(list).getTotal());
+        return rspData;
+    }
+
+    /**
+     * 响应请求分页数据
+     *
+     * @param page 分页查询结果
+     * @return 结果
+     */
+    protected TableDataInfo getDataTable(Page<?> page) {
+        TableDataInfo rspData = new TableDataInfo();
+        rspData.setCode(HttpStatus.SUCCESS);
+        rspData.setRows(page.getRecords());
+        rspData.setMsg("查询成功");
+        rspData.setTotal(page.getTotal());
         return rspData;
     }
 
