@@ -1,11 +1,13 @@
 package com.ruoyi.admin.domain;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ruoyi.common.core.annotation.Excel;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -125,18 +127,21 @@ public class IdentifyResult implements Serializable {
     /**
      * 删除标识,0-未删除,1-已删除
      */
-    private Byte deletedAt;
+    private Integer deletedAt;
 
     /**
      * 创建时间
      */
-    private Date createdAt;
+    @TableField(fill = FieldFill.INSERT)
+    private String createdAt;
 
     /**
      * 更新时间
      */
-    private Date updatedAt;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private String updatedAt;
 
+    @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 

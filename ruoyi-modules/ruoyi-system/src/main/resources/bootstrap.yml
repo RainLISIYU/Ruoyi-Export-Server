@@ -49,4 +49,4 @@ dubbo:
   registry:
     address: nacos://127.0.0.1:8848?username=nacos&password=nacos123456.
   application:
-    serialize-check-status: WARN
+    serialize-check-status: WARNt l

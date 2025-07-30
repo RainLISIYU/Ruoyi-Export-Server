@@ -29,4 +29,12 @@ public interface IdentifyResultService extends IService<IdentifyResult> {
      */
     AjaxResult importData(MultipartFile[] file);
 
+    /**
+     * 模板上传
+     *
+     * @param file 文件
+     * @return 上传结果
+     */
+    AjaxResult uploadTemplate(MultipartFile file);
+
 }
