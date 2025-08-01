@@ -130,6 +130,11 @@ public class IdentifyResult implements Serializable {
     private Integer deletedAt;
 
     /**
+     * 生成证书路径
+     */
+    private String certificateUrl;
+
+    /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)

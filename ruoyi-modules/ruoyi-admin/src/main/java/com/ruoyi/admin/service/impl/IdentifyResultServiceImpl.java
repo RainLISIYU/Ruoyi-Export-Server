@@ -2,8 +2,11 @@ package com.ruoyi.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deepoove.poi.data.Pictures;
+import com.deepoove.poi.data.Texts;
 import com.ruoyi.admin.domain.CertificateTemplate;
 import com.ruoyi.admin.domain.IdentifyResult;
 import com.ruoyi.admin.service.CertificateTemplateService;
@@ -11,9 +14,11 @@ import com.ruoyi.admin.service.IdentifyResultService;
 import com.ruoyi.admin.mapper.IdentifyResultMapper;
 import com.ruoyi.common.core.constant.SecurityConstants;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.utils.DateUtils;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.ruoyi.common.core.utils.file.FileUtils;
 import com.ruoyi.common.core.utils.poi.ExcelUtil;
+import com.ruoyi.common.core.utils.poi.WordUtil;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import com.ruoyi.common.datasource.config.MyMetaObjectHandler;
 import com.ruoyi.common.security.utils.DictUtils;
@@ -27,17 +32,19 @@ import org.redisson.api.RLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,6 +70,12 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Value("${file.path}")
+    private String path;
+
+    @Value("${file.prefix}")
+    private String prefix;
+
     private final String ORDER_MAX_NO = "certified_max_no:";
 
     @Resource
@@ -78,6 +91,7 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public AjaxResult importData(MultipartFile[] file) {
         ExcelUtil<IdentifyResult> util = new ExcelUtil<>(IdentifyResult.class);
         logger.info("开始导入数据{}", MDC.get(SecurityConstants.TRACE_ID));
@@ -94,18 +108,19 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
         }
         // 获取字典map
         Map<String, String> dictDataMap = DictUtils.dictDataToMap(sysExportOption.getData());
-
         boolean startFlag = true;
         for (MultipartFile upFile : file) {
             // 分批导入数据
             try(InputStream is = upFile.getInputStream()) {
                 List<IdentifyResult> list;
                 do {
-                    list = util.importExcel(is, 3, Integer.parseInt(dictDataMap.get("batch_size")), startFlag);
+                    list = util.importExcel(is, 3, dictDataMap.get("batch_size") == null ? 100 : Integer.parseInt(dictDataMap.get("batch_size")), startFlag);
                     startFlag = false;
                     // 处理导入数据
                     handleImportData(list, getCertificateNos(dictDataMap, list.size()));
                     logger.info("导入数据:{}", list.size());
+                    // 保存数据
+                    this.saveBatch(list);
                 } while (! list.isEmpty());
             } catch (Exception e) {
                 logger.error("导入失败:{}", e.getMessage());
@@ -132,6 +147,153 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
         template.setFileName(FileUtils.getName(uploadFile.getUrl()));
         certificateTemplateService.save(template);
         return AjaxResult.success(upload);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AjaxResult genCertificate(List<String> ids) {
+        // 查询需要生成的数据
+        List<IdentifyResult> identifyResults = this.listByIds(ids);
+        // 查询最新模板信息
+        CertificateTemplate certificateTemplate = certificateTemplateService.getLastTemplate();
+        if (StringUtils.isNull(certificateTemplate)) {
+            return AjaxResult.error("请先上传模板");
+        }
+        // 获取导入字典参数
+        R<List<SysDictData>> sysExportOption = remoteDictService.feignDictType("sys_export_option", SecurityConstants.INNER);
+        if (!R.isSuccess(sysExportOption)) {
+            return AjaxResult.error("导入参数获取失败");
+        }
+        // 获取字典map
+        Map<String, String> dictDataMap = DictUtils.dictDataToMap(sysExportOption.getData());
+        // 根据数据生成文件
+        boolean result = resultToCertificate(identifyResults, certificateTemplate, dictDataMap);
+        if (!result) {
+            return AjaxResult.error("证书生成失败");
+        }
+        // 保存证书信息
+        this.updateBatchById(identifyResults, dictDataMap.get("batch_size") == null ? 500 : Integer.parseInt(dictDataMap.get("batch_size")));
+        return AjaxResult.success();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AjaxResult delCertificate(List<String> ids) {
+        boolean res = this.removeBatchByIds(ids);
+        if (! res) {
+            return AjaxResult.error("删除失败");
+        }
+        // 获取导入字典参数
+        R<List<SysDictData>> sysExportOption = remoteDictService.feignDictType("sys_export_option", SecurityConstants.INNER);
+        if (!R.isSuccess(sysExportOption)) {
+            return AjaxResult.error("导入参数获取失败");
+        }
+        // 获取字典map
+        Map<String, String> dictDataMap = DictUtils.dictDataToMap(sysExportOption.getData());
+        redisTemplate.delete(ORDER_MAX_NO + getCachePrefix(dictDataMap));
+        // 删除编号缓存
+        String cacheKey = ORDER_MAX_NO + getCachePrefix(dictDataMap);
+        redisTemplate.delete(cacheKey);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 根据检定结果生成证书
+     *
+     * @param identifyResults 检定结果
+     * @param certificateTemplate 模板信息
+     * @return 是否成功
+     */
+    private boolean resultToCertificate(List<IdentifyResult> identifyResults, CertificateTemplate certificateTemplate, Map<String, String> dictDataMap) {
+        for (IdentifyResult identifyResult : identifyResults) {
+            // 模板map
+            Map<String, Object> dataMap = new HashMap<>();
+            // 生成文件路径
+            String fileName = extractFilename(identifyResult, dictDataMap);
+            // 获取模板路径
+            String remoteUrl = certificateTemplate.getFileUrl();
+            String localUrl = remoteUrl.replace(prefix, path);
+            try {
+                // 设置参数
+                resultToMap(identifyResult, dataMap);
+                // 生成文件
+                WordUtil.exportWordByTemplate(localUrl, path + fileName, dataMap);
+            } catch (Exception e) {
+                logger.error("生成证书失败:{}", e.getMessage());
+                e.printStackTrace();
+                return false;
+            }
+            identifyResult.setCertificateUrl(prefix + fileName);
+        }
+        return true;
+    }
+
+    /**
+     * 根据导入数据生成map
+     * @param identifyResult 导入数据
+     * @param dataMap 模板map
+     */
+    private void resultToMap(IdentifyResult identifyResult, Map<String, Object> dataMap) throws ParseException {
+        dataMap.put("certificateNo", identifyResult.getCertificateNo());
+        dataMap.put("certificateNo1", identifyResult.getCertificateNo());
+        dataMap.put("submissionUnit", Texts.of("山西XX公司").create());
+        dataMap.put("equipmentName", Texts.of(identifyResult.getEquipmentName()).create());
+        dataMap.put("model", Texts.of(identifyResult.getModel()).create());
+        dataMap.put("factoryNumber", Texts.of(identifyResult.getFactoryNumber()).create());
+        dataMap.put("factoryName", Texts.of(identifyResult.getFactoryName()).create());
+        dataMap.put("basisCode", Texts.of("TC-438《技术复核啥地方胡搜ID哈佛手打哈佛四大》").create());
+        dataMap.put("verifyResult", Texts.of("符合1.6级规范").create());
+        dataMap.put("approve", Pictures.of("D:\\ruoyi\\uploadPath\\2025\\08\\01\\pict\\图片1.png").size(86, 35).create());
+        dataMap.put("verify1", Pictures.of("D:\\ruoyi\\uploadPath\\2025\\08\\01\\pict\\图片2.png").size(86, 35).create());
+        dataMap.put("verify2", Pictures.of("D:\\ruoyi\\uploadPath\\2025\\08\\01\\pict\\图片3.png").size(86, 35).create());
+        String verifyDate = identifyResult.getAppraisalDate();
+        if (StringUtils.isNotEmpty(verifyDate)) {
+            if (verifyDate.length() > 10) {
+                verifyDate = verifyDate.substring(0, 10);
+            }
+            LocalDate verifyLocalDate = LocalDate.parse(verifyDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            LocalDate periodLocalDate = verifyLocalDate.plusMonths(identifyResult.getEffectivePeriod()).plusDays(-1);
+            String periodDate = periodLocalDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            dataMap.put("y1", verifyDate.split("-")[0]);
+            dataMap.put("m1", verifyDate.split("-")[1]);
+            dataMap.put("d1", verifyDate.split("-")[2]);
+            dataMap.put("y2", periodDate.split("-")[0]);
+            dataMap.put("m2", periodDate.split("-")[1]);
+            dataMap.put("d2", periodDate.split("-")[2]);
+        }
+        dataMap.put("standardName", Texts.of("的撒发生的").create());
+        dataMap.put("standardRange", Texts.of("呃呃问问").create());
+        dataMap.put("standardNo", Texts.of("JD-3232看").create());
+        dataMap.put("standardPeriod", Texts.of("2028-03-01").create());
+        dataMap.put("appraisalAddress", Texts.of("吕梁市离石区204实验室").create());
+        dataMap.put("temperature", Texts.of("20").create());
+        dataMap.put("humidity", Texts.of("35").create());
+        dataMap.put("requirement1", Texts.of("的撒发生的").create());
+        dataMap.put("data1", Texts.of("符合").create());
+        dataMap.put("res1", Texts.of("合格").create());
+        dataMap.put("requirement2", Texts.of("的撒发生的").create());
+        dataMap.put("data2", Texts.of("符合").create());
+        dataMap.put("res2", Texts.of("合格").create());
+        dataMap.put("requirement3", Texts.of("的撒发生的").create());
+        dataMap.put("data3", Texts.of("±1.5").create());
+        dataMap.put("res3", Texts.of("合格").create());
+        dataMap.put("requirement4", Texts.of("的撒发生的").create());
+        dataMap.put("data4", Texts.of("1.5 Mpa").create());
+        dataMap.put("res4", Texts.of("合格").create());
+        dataMap.put("requirement5", Texts.of("的撒发生的").create());
+        dataMap.put("data5", Texts.of("±3.2 Kpa").create());
+        dataMap.put("res5", Texts.of("合格").create());
+    }
+
+    private String extractFilename(IdentifyResult identifyResult, Map<String, String> dictDataMap) {
+        // 获取配置中的文件名
+        String fileName = dictDataMap.get("certificate_name") == null ? "一般压力表检定证书" : dictDataMap.get("certificate_name");
+        // 获取当前证书编号后4位
+        String certificateNo = identifyResult.getCertificateNo();
+        certificateNo = certificateNo.substring(certificateNo.length() - 4);
+        // 文件类型
+        String fileType = dictDataMap.get("file_type") == null ? "docx" : dictDataMap.get("file_type");
+        return StringUtils.format("/{}/certificate/{}{}.{}", DateUtils.datePath(), fileName, certificateNo, fileType);
     }
 
     /**
@@ -180,9 +342,12 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
     private String getCachePrefix(Map<String, String> dataMap) {
         // 获取前缀字母
         String prefix = dataMap.get("certificate_prefix");
+        if (StringUtils.isEmpty( prefix )) {
+            prefix = "HDYB";
+        }
         // 当前年
         String year = LocalDate.now().format(DateTimeFormatter.ofPattern("yy"));
-        prefix = prefix + year.substring(year.length() - 2);
+        prefix = prefix + year;
         return prefix;
     }
 
@@ -225,7 +390,6 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
         // 设置缓存
         maxNo = redisTemplate.opsForValue().increment(cacheKey, maxNo - 1);
         return maxNo;
-
     }
 
 }

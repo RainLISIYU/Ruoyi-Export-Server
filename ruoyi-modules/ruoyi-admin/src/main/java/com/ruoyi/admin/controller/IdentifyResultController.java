@@ -9,11 +9,10 @@ import com.ruoyi.common.core.web.page.TableDataInfo;
 import com.ruoyi.system.api.RemoteDictService;
 import com.ruoyi.system.api.RemoteFileService;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author lsy
@@ -41,11 +40,16 @@ public class IdentifyResultController extends BaseController {
      * @param pageSize 页大小
      * @return 查询结果
      */
-    @RequestMapping("/page")
+    @GetMapping("/page")
     public TableDataInfo page(IdentifyResult identifyResult, @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         logger.info("开始查询");
         Page<IdentifyResult> page = identifyResultService.getPage(identifyResult, pageNum, pageSize);
         return getDataTable(page);
+    }
+
+    @GetMapping("/{id}")
+    public AjaxResult getIdentifyResult(@PathVariable("id") String id) {
+        return success(identifyResultService.getById(id));
     }
 
     /**
@@ -60,11 +64,50 @@ public class IdentifyResultController extends BaseController {
         return identifyResultService.importData(file);
     }
 
+    /**
+     * 模板上传
+     *
+     * @param file 模板文件
+     * @return 模板上传结果
+     */
     @PostMapping("/uploadTemplate")
     public AjaxResult uploadTemplate(@RequestParam("file") MultipartFile file) {
 
         return identifyResultService.uploadTemplate(file);
 
+    }
+
+    /**
+     * 新增或更新
+     *
+     * @param identifyResult 数据
+     * @return 结果
+     */
+    @PostMapping("")
+    public AjaxResult saveOrUpdate(@RequestBody IdentifyResult identifyResult) {
+        return identifyResultService.saveOrUpdate(identifyResult) ? success() : error();
+    }
+
+    /**
+     * 删除数据
+     *
+     * @param ids 删除数据id
+     * @return 删除结果
+     */
+    @DeleteMapping("")
+    public AjaxResult delete(@RequestParam("ids") List<String> ids) {
+        return identifyResultService.delCertificate(ids);
+    }
+
+    /**
+     * 生成证书
+     *
+     * @param ids 数据ids
+     * @return 生成结果
+     */
+    @PostMapping("/genCertificate")
+    public AjaxResult genCertificate(@RequestParam("ids") List<String> ids) {
+        return identifyResultService.genCertificate(ids);
     }
 
 }

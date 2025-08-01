@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.common.core.web.domain.AjaxResult;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  *
  */
@@ -37,4 +39,19 @@ public interface IdentifyResultService extends IService<IdentifyResult> {
      */
     AjaxResult uploadTemplate(MultipartFile file);
 
+    /**
+     * 生成报告
+     *
+     * @param ids 数据ids
+     * @return 生成结果
+     */
+    AjaxResult genCertificate(List<String> ids);
+
+    /**
+     * 删除导入数据
+     *
+     * @param ids 数据id
+     * @return 结果
+     */
+    AjaxResult delCertificate(List<String> ids);
 }

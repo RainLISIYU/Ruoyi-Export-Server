@@ -36,6 +36,11 @@ public class CertificateTemplate implements Serializable {
     private Long fileId;
 
     /**
+     * 本地模板文件路径
+     */
+    private String fileLocalUrl;
+
+    /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
@@ -72,6 +77,7 @@ public class CertificateTemplate implements Serializable {
             && (this.getFileName() == null ? other.getFileName() == null : this.getFileName().equals(other.getFileName()))
             && (this.getFileUrl() == null ? other.getFileUrl() == null : this.getFileUrl().equals(other.getFileUrl()))
             && (this.getFileId() == null ? other.getFileId() == null : this.getFileId().equals(other.getFileId()))
+            && (this.getFileLocalUrl() == null ? other.getFileLocalUrl() == null : this.getFileLocalUrl().equals(other.getFileLocalUrl()))
             && (this.getCreatedAt() == null ? other.getCreatedAt() == null : this.getCreatedAt().equals(other.getCreatedAt()))
             && (this.getUpdatedAt() == null ? other.getUpdatedAt() == null : this.getUpdatedAt().equals(other.getUpdatedAt()))
             && (this.getDeletedAt() == null ? other.getDeletedAt() == null : this.getDeletedAt().equals(other.getDeletedAt()));
@@ -85,6 +91,7 @@ public class CertificateTemplate implements Serializable {
         result = prime * result + ((getFileName() == null) ? 0 : getFileName().hashCode());
         result = prime * result + ((getFileUrl() == null) ? 0 : getFileUrl().hashCode());
         result = prime * result + ((getFileId() == null) ? 0 : getFileId().hashCode());
+        result = prime * result + ((getFileLocalUrl() == null) ? 0 : getFileLocalUrl().hashCode());
         result = prime * result + ((getCreatedAt() == null) ? 0 : getCreatedAt().hashCode());
         result = prime * result + ((getUpdatedAt() == null) ? 0 : getUpdatedAt().hashCode());
         result = prime * result + ((getDeletedAt() == null) ? 0 : getDeletedAt().hashCode());
@@ -101,6 +108,7 @@ public class CertificateTemplate implements Serializable {
         sb.append(", fileName=").append(fileName);
         sb.append(", fileUrl=").append(fileUrl);
         sb.append(", fileId=").append(fileId);
+        sb.append(", fileLocalUrl=").append(fileLocalUrl);
         sb.append(", createdAt=").append(createdAt);
         sb.append(", updatedAt=").append(updatedAt);
         sb.append(", deletedAt=").append(deletedAt);

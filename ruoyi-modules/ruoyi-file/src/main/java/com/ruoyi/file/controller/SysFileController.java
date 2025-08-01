@@ -53,6 +53,7 @@ public class SysFileController
             sysFile.setName(FileUtils.getName(url));
             sysFile.setUrl(url);
             sysFile.setId(sysFilePo.getId());
+            sysFile.setLocalUrl(sysFilePo.getLocalPath());
             return R.ok(sysFile);
         }
         catch (Exception e)
@@ -83,6 +84,7 @@ public class SysFileController
             sysFile.setName(FileUtils.getName(sysFilePo.getRemotePath()));
             sysFile.setUrl(sysFilePo.getRemotePath());
             sysFile.setId(sysFilePo.getId());
+            sysFile.setLocalUrl(sysFilePo.getLocalPath());
             sysFiles.add(sysFile);
         });
         return R.ok(sysFiles);
@@ -102,6 +104,7 @@ public class SysFileController
             sysFile.setName(FileUtils.getName(sysFilePo.getRemotePath()));
             sysFile.setUrl(sysFilePo.getRemotePath());
             sysFile.setId(sysFilePo.getId());
+            sysFile.setLocalUrl(sysFilePo.getLocalPath());
             return sysFile;
         }).toList();
         return R.ok(sysFiles);
@@ -123,6 +126,7 @@ public class SysFileController
             sysFile.setName(file.getFileName());
             sysFile.setUrl(file.getRemotePath());
             sysFile.setId(file.getId());
+            sysFile.setLocalUrl(file.getLocalPath());
             sysFiles.add(sysFile);
         }
         return R.ok(sysFiles);
