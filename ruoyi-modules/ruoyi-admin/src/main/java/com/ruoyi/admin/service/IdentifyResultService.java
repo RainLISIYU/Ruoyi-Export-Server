@@ -54,4 +54,12 @@ public interface IdentifyResultService extends IService<IdentifyResult> {
      * @return 结果
      */
     AjaxResult delCertificate(List<String> ids);
+
+    /**
+     * 根据id查询导入数据
+     *
+     * @param id 数据id
+     * @return 查询结果
+     */
+    IdentifyResult getIdentifyResultById(String id);
 }

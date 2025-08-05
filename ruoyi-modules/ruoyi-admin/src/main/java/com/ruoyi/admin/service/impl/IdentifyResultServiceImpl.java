@@ -197,6 +197,11 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
         return AjaxResult.success();
     }
 
+    @Override
+    public IdentifyResult getIdentifyResultById(String id) {
+        return this.getById(id);
+    }
+
     /**
      * 根据检定结果生成证书
      *
@@ -236,16 +241,22 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
     private void resultToMap(IdentifyResult identifyResult, Map<String, Object> dataMap) throws ParseException {
         dataMap.put("certificateNo", identifyResult.getCertificateNo());
         dataMap.put("certificateNo1", identifyResult.getCertificateNo());
-        dataMap.put("submissionUnit", Texts.of("山西XX公司").create());
+        dataMap.put("submissionUnit", Texts.of("1").create());
         dataMap.put("equipmentName", Texts.of(identifyResult.getEquipmentName()).create());
         dataMap.put("model", Texts.of(identifyResult.getModel()).create());
         dataMap.put("factoryNumber", Texts.of(identifyResult.getFactoryNumber()).create());
         dataMap.put("factoryName", Texts.of(identifyResult.getFactoryName()).create());
-        dataMap.put("basisCode", Texts.of("TC-438《技术复核啥地方胡搜ID哈佛手打哈佛四大》").create());
-        dataMap.put("verifyResult", Texts.of("符合1.6级规范").create());
-        dataMap.put("approve", Pictures.of("D:\\ruoyi\\uploadPath\\2025\\08\\01\\pict\\图片1.png").size(86, 35).create());
-        dataMap.put("verify1", Pictures.of("D:\\ruoyi\\uploadPath\\2025\\08\\01\\pict\\图片2.png").size(86, 35).create());
-        dataMap.put("verify2", Pictures.of("D:\\ruoyi\\uploadPath\\2025\\08\\01\\pict\\图片3.png").size(86, 35).create());
+        dataMap.put("basisCode", Texts.of("1").create());
+        dataMap.put("verifyResult", Texts.of("1").create());
+        if (StringUtils.isNotEmpty(identifyResult.getApproveUrl())) {
+            dataMap.put("approve", Pictures.of(identifyResult.getApproveUrl().replace(prefix, path)).size(86, 35).create());
+        }
+        if (StringUtils.isNotEmpty(identifyResult.getCheckUrl())) {
+            dataMap.put("verify1", Pictures.of(identifyResult.getCheckUrl().replace(prefix, path)).size(86, 35).create());
+        }
+        if (StringUtils.isNotEmpty(identifyResult.getVerifyUrl())) {
+            dataMap.put("verify2", Pictures.of(identifyResult.getVerifyUrl().replace(prefix, path)).size(86, 35).create());
+        }
         String verifyDate = identifyResult.getAppraisalDate();
         if (StringUtils.isNotEmpty(verifyDate)) {
             if (verifyDate.length() > 10) {
@@ -261,28 +272,31 @@ public class IdentifyResultServiceImpl extends ServiceImpl<IdentifyResultMapper,
             dataMap.put("m2", periodDate.split("-")[1]);
             dataMap.put("d2", periodDate.split("-")[2]);
         }
-        dataMap.put("standardName", Texts.of("的撒发生的").create());
-        dataMap.put("standardRange", Texts.of("呃呃问问").create());
-        dataMap.put("standardNo", Texts.of("JD-3232看").create());
-        dataMap.put("standardPeriod", Texts.of("2028-03-01").create());
-        dataMap.put("appraisalAddress", Texts.of("吕梁市离石区204实验室").create());
-        dataMap.put("temperature", Texts.of("20").create());
-        dataMap.put("humidity", Texts.of("35").create());
-        dataMap.put("requirement1", Texts.of("的撒发生的").create());
-        dataMap.put("data1", Texts.of("符合").create());
-        dataMap.put("res1", Texts.of("合格").create());
-        dataMap.put("requirement2", Texts.of("的撒发生的").create());
-        dataMap.put("data2", Texts.of("符合").create());
-        dataMap.put("res2", Texts.of("合格").create());
-        dataMap.put("requirement3", Texts.of("的撒发生的").create());
-        dataMap.put("data3", Texts.of("±1.5").create());
-        dataMap.put("res3", Texts.of("合格").create());
-        dataMap.put("requirement4", Texts.of("的撒发生的").create());
-        dataMap.put("data4", Texts.of("1.5 Mpa").create());
-        dataMap.put("res4", Texts.of("合格").create());
-        dataMap.put("requirement5", Texts.of("的撒发生的").create());
-        dataMap.put("data5", Texts.of("±3.2 Kpa").create());
-        dataMap.put("res5", Texts.of("合格").create());
+        dataMap.put("standardName", Texts.of("1").create());
+        dataMap.put("standardRange", Texts.of("1").create());
+        dataMap.put("standardNo", Texts.of("1").create());
+        dataMap.put("standardPeriod", Texts.of("1").create());
+        dataMap.put("appraisalAddress", Texts.of("1").create());
+        dataMap.put("temperature", Texts.of("1").create());
+        dataMap.put("humidity", Texts.of("1").create());
+        dataMap.put("requirement1", Texts.of("1").create());
+        dataMap.put("data1", Texts.of("1").create());
+        dataMap.put("res1", Texts.of("1").create());
+        dataMap.put("requirement2", Texts.of("1").create());
+        dataMap.put("data2", Texts.of("1").create());
+        dataMap.put("res2", Texts.of("1").create());
+        dataMap.put("requirement3", Texts.of("1").create());
+        dataMap.put("data3", Texts.of("1").create());
+        dataMap.put("res3", Texts.of("1").create());
+        dataMap.put("requirement4", Texts.of("1").create());
+        dataMap.put("data4", Texts.of("1").create());
+        dataMap.put("res4", Texts.of("1").create());
+        dataMap.put("requirement5", Texts.of("1").create());
+        dataMap.put("data5", Texts.of("1").create());
+        dataMap.put("res5", Texts.of("1").create());
+        dataMap.put("requirement6", Texts.of("1").create());
+        dataMap.put("data6", Texts.of("1").create());
+        dataMap.put("res6", Texts.of("1").create());
     }
 
     private String extractFilename(IdentifyResult identifyResult, Map<String, String> dictDataMap) {

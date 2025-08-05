@@ -10,6 +10,7 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 检定数据表
@@ -133,6 +134,21 @@ public class IdentifyResult implements Serializable {
      * 生成证书路径
      */
     private String certificateUrl;
+
+    /**
+     * 批准人签名路径
+     */
+    private String approveUrl;
+
+    /**
+     * 核验员签名路径
+     */
+    private String checkUrl;
+
+    /**
+     * 检定员签名路径
+     */
+    private String verifyUrl;
 
     /**
      * 创建时间

@@ -47,9 +47,14 @@ public class IdentifyResultController extends BaseController {
         return getDataTable(page);
     }
 
+    /**
+     * 根据id获取导入数据
+     * @param id 数据id
+     * @return 数据结果
+     */
     @GetMapping("/{id}")
     public AjaxResult getIdentifyResult(@PathVariable("id") String id) {
-        return success(identifyResultService.getById(id));
+        return success(identifyResultService.getIdentifyResultById(id));
     }
 
     /**
